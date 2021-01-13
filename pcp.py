@@ -58,6 +58,9 @@ def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
     rank = np.min(shape)
     S = np.zeros(shape)
     Y = np.zeros(shape)
+    errors = []
+    ranks = []
+    nnzs = []
     while i < max(maxiter, 1):
         # SVD step.
         strt = time.time()
@@ -79,6 +82,9 @@ def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
 
         # Check for convergence.
         err = np.sqrt(np.sum(step ** 2) / norm)
+        errors.append(err)
+        ranks.append(np.sum(s > 0))
+        nnzs.append(np.sum(S > 0))
         if verbose:
             print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
                    "time={4:.3e}")
@@ -89,7 +95,7 @@ def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
 
     if i >= maxiter:
         logging.warn("convergence not reached in pcp")
-    return L, S, (u, s, v)
+    return L, S, (u, s, v), errors, ranks, nnzs
 
 
 def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
@@ -128,6 +134,9 @@ def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_d
     rank = np.min(shape)
     S = np.zeros(shape)
     Y = np.zeros(shape)
+    errors = []
+    ranks = []
+    nnzs = []
     while i < max(maxiter, 1):
         # SVD step.
         strt = time.time()
@@ -149,6 +158,9 @@ def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_d
 
         # Check for convergence.
         err = np.sqrt(np.sum(step ** 2) / norm)
+        errors.append(err)
+        ranks.append(np.sum(s > 0))
+        nnzs.append(np.sum(S > 0))
         if verbose:
             print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
                    "time={4:.3e}")
@@ -159,7 +171,7 @@ def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_d
 
     if i >= maxiter:
         logging.warn("convergence not reached in pcp")
-    return L, S, (u, s, v)
+    return L, S, (u, s, v), errors, ranks, nnzs
 
 
 def complex_pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
