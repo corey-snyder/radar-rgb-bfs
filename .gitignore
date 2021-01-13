@@ -1,4 +1,4 @@
-*.png
+.png
 *.npy
 *checkpoint.ipynb
 *.xml
