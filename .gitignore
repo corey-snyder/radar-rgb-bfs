@@ -1,5 +1,5 @@
 .png
-*.npy
+
 *checkpoint.ipynb
 *.xml
 *.pyc
