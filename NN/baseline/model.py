@@ -28,7 +28,7 @@ class IstaLayer(nn.Module):
         self.p5 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
         self.p6 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
 
-        self.lambda1 = nn.Parameter(torch.tensor([.01]))  # change
+        self.lambda1 = nn.Parameter(torch.tensor([.1]))  # change
         self.lambda2 = nn.Parameter(torch.tensor([.01]))  # change
 
         self.threshold = nn.Threshold(0,0)
@@ -44,6 +44,7 @@ class IstaLayer(nn.Module):
         notation for intermediate values will follow that of the cited paper.
         For example, L convolved with P_5 will be labeled L5
         """
+        print(self.lambda1, self.lambda2)
         (D,L,S) = input
 
         L5 = self.p5(L)
@@ -98,8 +99,8 @@ class IstaNet(nn.Module):
             components = self.ista2(components)
             components = self.ista3(components)
             components = self.ista4(components)
-            # components = self.ista5(components)
-            # components = self.ista6(components)
+            components = self.ista5(components)
+            components = self.ista6(components)
             # components = self.ista7(components)
             # components = self.ista8(components)
             # components = self.ista9(components)
