@@ -5,6 +5,7 @@ Deep Unfolded Robust PCA with Application to Clutter Suppression in Ultrasound
 
 import torch
 import torch.nn as nn
+from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 
 
@@ -14,22 +15,22 @@ class IstaLayer(nn.Module):
     Assuming images are grayscale
     """
 
-    def __init__(self, n_frames, im_height, im_width, kernel_size, padding):
+    def __init__(self, im_height, im_width, kernel_size, padding):
         super().__init__()
 
-        self.n_frames = n_frames
+        # self.n_frames = n_frames
         self.im_height = im_height
         self.im_width = im_width
 
-        self.p1 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
-        self.p2 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
-        self.p3 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
-        self.p4 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
-        self.p5 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
-        self.p6 = nn.Conv2d(in_channels=n_frames,out_channels=n_frames,kernel_size=kernel_size,padding=padding)
+        self.p1 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p2 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p3 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p4 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p5 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p6 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
 
-        self.lambda1 = nn.Parameter(torch.tensor([.1]))  # change
-        self.lambda2 = nn.Parameter(torch.tensor([.01]))  # change
+        self.lambda1 = nn.Parameter(torch.tensor([3.]))  # change
+        self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
 
         self.threshold = nn.Threshold(0,0)
 
@@ -44,7 +45,7 @@ class IstaLayer(nn.Module):
         notation for intermediate values will follow that of the cited paper.
         For example, L convolved with P_5 will be labeled L5
         """
-        print(self.lambda1, self.lambda2)
+        # print(self.lambda1, self.lambda2)
         (D,L,S) = input
 
         L5 = self.p5(L)
@@ -66,43 +67,45 @@ class IstaLayer(nn.Module):
         L_stacked = torch.mm(torch.mm(u, torch.diag(s)), v.t())
 
         D_out = D
-        L_out = L_stacked.T.reshape(-1,self.n_frames,self.im_height,self.im_width)
+        L_out = L_stacked.T.reshape(-1,1,self.im_height,self.im_width)
         S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-self.lambda2)
 
         return D_out, L_out, S_out
 
 
 class IstaNet(nn.Module):
-        def __init__(self, n_frames, im_height, im_width):
+        def __init__(self, im_height, im_width, writer):
             super().__init__()
-            self.n_frames = 1# n_frames
+            # self.n_frames = 1# n_frames
             self.im_height = im_height
             self.im_width = im_width
+            self.writer = writer
 
-            self.ista1 = IstaLayer(self.n_frames, im_height, im_width, 5,padding=(2,2))
-            self.ista2 = IstaLayer(self.n_frames, im_height, im_width, 5,padding=(2,2))
-            self.ista3 = IstaLayer(self.n_frames, im_height, im_width, 5,padding=(2,2))
-            self.ista4 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista5 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista6 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista7 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista8 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista9 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
-            self.ista10 = IstaLayer(self.n_frames, im_height, im_width, 3,padding=(1,1))
+            self.ista1 = IstaLayer(im_height, im_width, 5,padding=(2,2))
+            self.ista2 = IstaLayer(im_height, im_width, 5,padding=(2,2))
+            self.ista3 = IstaLayer(im_height, im_width, 5,padding=(2,2))
+            self.ista4 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            self.ista5 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            self.ista6 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            self.ista7 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            self.ista8 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            # self.ista9 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            # self.ista10 = IstaLayer(im_height, im_width, 3,padding=(1,1))
 
-        def forward(self,input):
+        def forward(self,D,L,S):
             """
             :param input: tuple of D,L,S
             :return: tuple of D, L, S
             """
+            input = (D,L,S)
             components = self.ista1(input)
             components = self.ista2(components)
             components = self.ista3(components)
             components = self.ista4(components)
             components = self.ista5(components)
             components = self.ista6(components)
-            # components = self.ista7(components)
-            # components = self.ista8(components)
+            components = self.ista7(components)
+            components = self.ista8(components)
             # components = self.ista9(components)
             # components = self.ista10(components)
 

@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from model import IstaNet
+from torch.utils.tensorboard import SummaryWriter
+from tensorboard_helper import plot_classes_preds
 
 
 def load_data(path):
@@ -12,15 +14,15 @@ def load_data(path):
     S = np.load(path + '/S_pcp.npy')
 
     # Add channel dimension, new shape = [50,1,720,1280] not including downsampling
-    D = D[:, None,::8,::8]
-    L = L[:,None,::8,::8]
-    S = S[:,None,::8,::8]
+    D = D[:30, None,::8,::8]
+    L = L[:30,None,::8,::8]
+    S = S[:30,None,::8,::8]
 
     return torch.from_numpy(D).float(), torch.from_numpy(L).float(), torch.from_numpy(S).float()
 
 if __name__ == '__main__':
     # check if CUDA is available
-    train_on_gpu = False # torch.cuda.is_available()
+    train_on_gpu = torch.cuda.is_available()
 
     if not train_on_gpu:
         print('CUDA is not available.  Training on CPU ...')
@@ -28,12 +30,15 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D,L,S = load_data('/home/spencer/research/radar-rgb-bfs/output')
-    target = torch.cat((L,S),1)  # concatenate the L and S in the channel dimension
+    D,L_target,S_target = load_data('/home/spencer/research/radar-rgb-bfs/output')
+    target = torch.cat((L_target,S_target),1)  # concatenate the L and S in the channel dimension
+
+    # Destination for tensorboard log data
+    writer = SummaryWriter('runs/ista_3')
 
     # init model
     (n_frames,n_channels,im_height,im_width) = D.shape
-    model = IstaNet(n_frames,im_height,im_width)
+    model = IstaNet(im_height,im_width,writer)
     if train_on_gpu:
         model.cuda()
     # specify loss function (categorical cross-entropy)
@@ -45,6 +50,14 @@ if __name__ == '__main__':
     # init L, S as zeros per PCP algorithm
     L = torch.zeros_like(D)
     S = torch.zeros_like(D)
+
+    # move tensors to GPU if CUDA is available
+    if train_on_gpu:
+        D, L, S, target = D.cuda(), L.cuda(), S.cuda(), target.cuda()
+
+    # tensorboard graph
+    writer.add_graph(model,(D,L,S))
+    writer.close()
 
     # train
 
@@ -61,15 +74,12 @@ if __name__ == '__main__':
         # train the model #
         ###################
         model.train()
-        # move tensors to GPU if CUDA is available
-        if train_on_gpu:
-            D, L, S, target = D.cuda(), L.cuda(), L.cuda(), target.cuda()
         # clear the gradients of all optimized variables
         optimizer.zero_grad()
         # test on multiple sequences per batch i.e. 5 batches each with 50 frames
 
         # forward pass: compute predicted outputs by passing inputs to the model
-        output = model((D,L,S))
+        output = model(D,L,S)
         # calculate the batch loss
         loss = criterion(output, target)
         # backward pass: compute gradient of the loss with respect to model parameters
@@ -77,7 +87,41 @@ if __name__ == '__main__':
         # perform a single optimization step (parameter update)
         optimizer.step()
         # update training loss
-        train_loss += loss.item() * D.size(0)
+        train_loss += loss.item()
+
+        # add training loss in tensorboard
+        writer.add_scalar('training pixel loss',
+                          loss.item(),
+                          epoch)
+
+
+
+        # add values of singular values of L in tensorboard
+        L_flat = torch.reshape(output[:,0], (-1, im_height * im_width)).T
+        (u, s, v) = torch.svd(L_flat)
+        s_dict = {}
+        for idx, ii in enumerate(s):
+            s_dict[str(idx)] = s[idx].item()
+        writer.add_scalars('sing. vals of L', s_dict,epoch)
+        writer.close()
+
+        # add rank of L to tensorboard
+        writer.add_scalar('rank of L', sum(s>1e-4),epoch)
+
+        # add lambda1 (SVD lambda)
+        writer.add_scalar('Lambda1 (SVD)', model.ista8.lambda1.item(), epoch)
+        writer.close()
+
+        # add lambda2 (Shrink S)
+        writer.add_scalar('Lambda2 Shrink S', model.ista8.lambda2.item(), epoch)
+        writer.close()
+
+        # show sample predictions
+        if epoch % 5:
+            writer.add_figure('predictions vs. actuals',
+                          plot_classes_preds(output.cpu().detach().numpy(),L_target.cpu().numpy(),S_target.numpy()),
+                          global_step=epoch)
+            writer.close
 
         # ######################
         # # validate the model #
@@ -95,7 +139,7 @@ if __name__ == '__main__':
         #     valid_loss += loss.item() * data.size(0)
 
         # calculate average losses
-        train_loss = train_loss / n_frames  # average loss per frame
+        # train_loss = train_loss  # average loss per pixel
         # valid_loss = valid_loss / len(valid_loader.sampler)
 
         # print training/validation statistics
@@ -109,19 +153,3 @@ if __name__ == '__main__':
         #         valid_loss))
         #     torch.save(model.state_dict(), 'model_cifar.pt')
         #     valid_loss_min = valid_loss
-        if epoch % 5 ==0:
-            plt.figure()
-            plt.subplot(221)
-            plt.imshow(target.numpy()[19, 0])
-            plt.title('target L')
-            plt.subplot(222)
-            plt.imshow(output.detach().numpy()[19,0])
-            plt.title('L')
-            plt.subplot(223)
-            plt.title('target S')
-            plt.imshow(target.numpy()[19, 1])
-            plt.subplot(224)
-            plt.imshow(output.detach().numpy()[19,1])
-            plt.title('S')
-            plt.suptitle(epoch)
-            plt.show()
