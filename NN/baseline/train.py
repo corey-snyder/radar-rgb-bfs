@@ -30,15 +30,18 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D,L_target,S_target = load_data('/home/spencer/research/radar-rgb-bfs/output')
-    target = torch.cat((L_target,S_target),1)  # concatenate the L and S in the channel dimension
+    D_train,L_train_target,S_train_target = load_data('/home/spencer/research/radar-rgb-bfs/output/csl_lobby_700')
+    target_train = torch.cat((L_train_target,S_train_target),1)  # concatenate the L and S in the channel dimension
+
+    D_test, L_test_target, S_test_target = load_data('/home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0')
+    target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
 
     # Destination for tensorboard log data
-    writer = SummaryWriter('runs/ista_3')
+    writer = SummaryWriter('runs/blah')
 
     # init model
-    (n_frames,n_channels,im_height,im_width) = D.shape
-    model = IstaNet(im_height,im_width,writer)
+    (n_frames,n_channels,im_height,im_width) = D_train.shape
+    model = IstaNet(im_height,im_width)
     if train_on_gpu:
         model.cuda()
     # specify loss function (categorical cross-entropy)
@@ -48,15 +51,18 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     # init L, S as zeros per PCP algorithm
-    L = torch.zeros_like(D)
-    S = torch.zeros_like(D)
+    L_train = torch.zeros_like(D_train)
+    S_train = torch.zeros_like(D_train)
+    L_test = torch.zeros_like(D_test)
+    S_test = torch.zeros_like(D_test)
 
     # move tensors to GPU if CUDA is available
     if train_on_gpu:
-        D, L, S, target = D.cuda(), L.cuda(), S.cuda(), target.cuda()
+        D_train, L_train, S_train, target_train = D_train.cuda(), L_train.cuda(), S_train.cuda(), target_train.cuda()
+        D_test, L_test, S_test, target_test = D_test.cuda(), L_test.cuda(), S_test.cuda(), target_test.cuda()
 
     # tensorboard graph
-    writer.add_graph(model,(D,L,S))
+    writer.add_graph(model,(D_train,L_train,S_train))
     writer.close()
 
     # train
@@ -79,9 +85,9 @@ if __name__ == '__main__':
         # test on multiple sequences per batch i.e. 5 batches each with 50 frames
 
         # forward pass: compute predicted outputs by passing inputs to the model
-        output = model(D,L,S)
+        output = model(D_train,L_train,S_train)
         # calculate the batch loss
-        loss = criterion(output, target)
+        loss = criterion(output, target_train)
         # backward pass: compute gradient of the loss with respect to model parameters
         loss.backward()
         # perform a single optimization step (parameter update)
@@ -109,47 +115,52 @@ if __name__ == '__main__':
         writer.add_scalar('rank of L', sum(s>1e-4),epoch)
 
         # add lambda1 (SVD lambda)
-        writer.add_scalar('Lambda1 (SVD)', model.ista8.lambda1.item(), epoch)
+        writer.add_scalar('Lambda1 (SVD) in last layer', model.ista8.lambda1.item(), epoch)
         writer.close()
 
         # add lambda2 (Shrink S)
-        writer.add_scalar('Lambda2 Shrink S', model.ista8.lambda2.item(), epoch)
+        writer.add_scalar('Lambda2 Shrink S in last layer', model.ista8.lambda2.item(), epoch)
         writer.close()
 
         # show sample predictions
-        if epoch % 5:
-            writer.add_figure('predictions vs. actuals',
-                          plot_classes_preds(output.cpu().detach().numpy(),L_target.cpu().numpy(),S_target.numpy()),
+        if epoch % 20:
+            # if train_on_gpu:
+                # output = output.cpu(), L_train_target.cpu()
+            writer.add_figure('predictions vs. actuals TRAIN',
+                          plot_classes_preds(output.cpu().detach().numpy(),L_train_target.cpu().numpy(),S_train_target.cpu().numpy()),
                           global_step=epoch)
-            writer.close
+            writer.close()
 
-        # ######################
-        # # validate the model #
-        # ######################
-        # model.eval()
-        # for data, target in valid_loader:
-        #     # move tensors to GPU if CUDA is available
-        #     if train_on_gpu:
-        #         data, target = data.cuda(), target.cuda()
-        #     # forward pass: compute predicted outputs by passing inputs to the model
-        #     output = model(data)
-        #     # calculate the batch loss
-        #     loss = criterion(output, target)
-        #     # update average validation loss
-        #     valid_loss += loss.item() * data.size(0)
+        ######################
+        # validate the model #
+        ######################
+        if epoch % 20 ==0:
+            model.eval()
+            # forward pass: compute predicted outputs by passing inputs to the model
+            output_test = model(D_test,L_test,S_test)
+            # calculate the batch loss
+            loss_test = criterion(output, target_test)
+            # update average validation loss
+            valid_loss += loss_test.item()
 
+            writer.add_figure('predictions vs. actuals TEST',
+                              plot_classes_preds(output_test.cpu().detach().numpy(), L_test_target.cpu().numpy(), S_test_target.numpy()),
+                              global_step=epoch)
+            del output_test,loss_test
+            writer.close()
+            print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
+                epoch, train_loss, valid_loss))
+        else:
+            print('Epoch: {} \tTraining Loss: {:.6f}'.format(
+                epoch, train_loss))
         # calculate average losses
         # train_loss = train_loss  # average loss per pixel
         # valid_loss = valid_loss / len(valid_loader.sampler)
 
-        # print training/validation statistics
-        print('Epoch: {} \tTraining Loss: {:.6f}'.format(
-            epoch, train_loss))
-
         # save model if validation loss has decreased
-        # if valid_loss <= valid_loss_min:
-        #     print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
-        #         valid_loss_min,
-        #         valid_loss))
-        #     torch.save(model.state_dict(), 'model_cifar.pt')
-        #     valid_loss_min = valid_loss
+        if (valid_loss <= valid_loss_min) and (valid_loss != 0):
+            print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
+                valid_loss_min,
+                valid_loss))
+            torch.save(model.state_dict(), 'model_bfs.pt')
+            valid_loss_min = valid_loss
