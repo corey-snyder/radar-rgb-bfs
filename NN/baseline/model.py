@@ -5,6 +5,7 @@ Deep Unfolded Robust PCA with Application to Clutter Suppression in Ultrasound
 
 import torch
 import torch.nn as nn
+import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 
@@ -29,7 +30,13 @@ class IstaLayer(nn.Module):
         self.p5 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
         self.p6 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
 
-        self.lambda1 = nn.Parameter(torch.tensor([3.]))  # change
+        lambda_from_pcp = 1/(im_height*im_width)
+        mu = .25 * im_height * im_width * 50 / (im_height * im_width * 50*.5) # assume mean abs value of input is .5
+
+        # self.lambda1 = nn.Parameter(torch.tensor([1/mu]))
+        # self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
+
+        self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
         self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
 
         self.threshold = nn.Threshold(0,0)
@@ -74,12 +81,11 @@ class IstaLayer(nn.Module):
 
 
 class IstaNet(nn.Module):
-        def __init__(self, im_height, im_width, writer):
+        def __init__(self, im_height, im_width):
             super().__init__()
             # self.n_frames = 1# n_frames
             self.im_height = im_height
             self.im_width = im_width
-            self.writer = writer
 
             self.ista1 = IstaLayer(im_height, im_width, 5,padding=(2,2))
             self.ista2 = IstaLayer(im_height, im_width, 5,padding=(2,2))
