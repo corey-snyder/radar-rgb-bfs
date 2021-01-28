@@ -37,7 +37,7 @@ if __name__ == '__main__':
     target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
 
     # Destination for tensorboard log data
-    writer = SummaryWriter('runs/blah')
+    writer = SummaryWriter('runs/higl1')
 
     # init model
     (n_frames,n_channels,im_height,im_width) = D_train.shape
@@ -49,21 +49,14 @@ if __name__ == '__main__':
 
     # specify optimizer
     optimizer = optim.Adam(model.parameters(), lr=0.01)
+    # scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=.75,step_size=75)
 
-    # init L, S as zeros per PCP algorithm
-    L_train = torch.zeros_like(D_train)
-    S_train = torch.zeros_like(D_train)
-    L_test = torch.zeros_like(D_test)
-    S_test = torch.zeros_like(D_test)
 
-    # move tensors to GPU if CUDA is available
-    if train_on_gpu:
-        D_train, L_train, S_train, target_train = D_train.cuda(), L_train.cuda(), S_train.cuda(), target_train.cuda()
-        D_test, L_test, S_test, target_test = D_test.cuda(), L_test.cuda(), S_test.cuda(), target_test.cuda()
 
-    # tensorboard graph
-    writer.add_graph(model,(D_train,L_train,S_train))
-    writer.close()
+
+    # # tensorboard graph
+    # writer.add_graph(model,(D_train,L_train,S_train))
+    # writer.close()
 
     # train
 
@@ -82,7 +75,12 @@ if __name__ == '__main__':
         model.train()
         # clear the gradients of all optimized variables
         optimizer.zero_grad()
-        # test on multiple sequences per batch i.e. 5 batches each with 50 frames
+
+        # init L, S as zeros per PCP algorithm
+        L_train = torch.zeros_like(D_train)
+        S_train = torch.zeros_like(D_train)
+        if train_on_gpu:
+            D_train, L_train, S_train, target_train = D_train.cuda(), L_train.cuda(), S_train.cuda(), target_train.cuda()
 
         # forward pass: compute predicted outputs by passing inputs to the model
         output = model(D_train,L_train,S_train)
@@ -136,10 +134,17 @@ if __name__ == '__main__':
         ######################
         if epoch % 20 ==0:
             model.eval()
+
+            L_test = torch.zeros_like(D_test)
+            S_test = torch.zeros_like(D_test)
+            # move tensors to GPU if CUDA is available
+            if train_on_gpu:
+                D_test, L_test, S_test, target_test = D_test.cuda(), L_test.cuda(), S_test.cuda(), target_test.cuda()
+
             # forward pass: compute predicted outputs by passing inputs to the model
             output_test = model(D_test,L_test,S_test)
             # calculate the batch loss
-            loss_test = criterion(output, target_test)
+            loss_test = criterion(output_test, target_test)
             # update average validation loss
             valid_loss += loss_test.item()
 
@@ -164,3 +169,5 @@ if __name__ == '__main__':
                 valid_loss))
             torch.save(model.state_dict(), 'model_bfs.pt')
             valid_loss_min = valid_loss
+
+        # scheduler.step()
