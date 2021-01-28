@@ -30,14 +30,14 @@ class IstaLayer(nn.Module):
         self.p5 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
         self.p6 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
 
-        lambda_from_pcp = 1/(im_height*im_width)
-        mu = .25 * im_height * im_width * 50 / (im_height * im_width * 50*.5) # assume mean abs value of input is .5
+        lambda_from_pcp = 1/np.sqrt(im_height*im_width) # sqrt of size of vectorized image
+        mu = 2 # assume mean abs value of input is .5
 
-        # self.lambda1 = nn.Parameter(torch.tensor([1/mu]))
-        # self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
+        self.lambda1 = nn.Parameter(torch.tensor([10/mu]))
+        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
 
-        self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
-        self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
+        # self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
+        # self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
 
         self.threshold = nn.Threshold(0,0)
 
