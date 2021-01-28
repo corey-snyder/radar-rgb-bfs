@@ -16,24 +16,25 @@ class IstaLayer(nn.Module):
     Assuming images are grayscale
     """
 
-    def __init__(self, im_height, im_width, kernel_size, padding):
+    def __init__(self, im_height, im_width, im_channels, kernel_size, padding):
         super().__init__()
 
         # self.n_frames = n_frames
         self.im_height = im_height
         self.im_width = im_width
 
-        self.p1 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
-        self.p2 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
-        self.p3 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
-        self.p4 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
-        self.p5 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
-        self.p6 = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=kernel_size,padding=padding)
+        self.p1 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p2 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p3 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p4 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p5 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p6 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
 
-        lambda_from_pcp = 1/np.sqrt(im_height*im_width) # sqrt of size of vectorized image
-        mu = 2 # assume mean abs value of input is .5
+        lambda_from_pcp = 1/np.sqrt(im_height*im_width) # sqrt of len of vectorized image
+        mu = .5  # assume mean abs value of input is .5
 
-        self.lambda1 = nn.Parameter(torch.tensor([10/mu]))
+        # notice in line below, mu is multiplied by 2
+        self.lambda1 = nn.Parameter(torch.tensor([2/mu]))
         self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
 
         # self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
@@ -66,7 +67,6 @@ class IstaLayer(nn.Module):
         L6_D2_S4 = L6+D2+S4
 
         L5_D1_S3 = torch.reshape(L5_D1_S3,(-1,self.im_height*self.im_width)).T
-        # L5_D1_S3 = L5_D1_S3.permute(0,2,1)
 
         (u,s,v) = torch.svd(L5_D1_S3)
         s = s - self.lambda1
@@ -81,40 +81,29 @@ class IstaLayer(nn.Module):
 
 
 class IstaNet(nn.Module):
-        def __init__(self, im_height, im_width):
+        def __init__(self, shape, n_layers):
             super().__init__()
-            # self.n_frames = 1# n_frames
-            self.im_height = im_height
-            self.im_width = im_width
+            self.n_channels = shape[1]
+            self.im_height = shape[2]
+            self.im_width = shape[3]
 
-            self.ista1 = IstaLayer(im_height, im_width, 5,padding=(2,2))
-            self.ista2 = IstaLayer(im_height, im_width, 5,padding=(2,2))
-            self.ista3 = IstaLayer(im_height, im_width, 5,padding=(2,2))
-            self.ista4 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            self.ista5 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            self.ista6 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            self.ista7 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            self.ista8 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            # self.ista9 = IstaLayer(im_height, im_width, 3,padding=(1,1))
-            # self.ista10 = IstaLayer(im_height, im_width, 3,padding=(1,1))
+            self.layers = nn.ModuleList()
+            for layer_idx in range(n_layers):
+                if layer_idx < 3:
+                    kernel_size = 5
+                else:
+                    kernel_size = 3
+                padding = int(np.floor(kernel_size / 2))
+                self.layers.append(IstaLayer(self.im_height, self.im_width, self.n_channels, kernel_size, padding=padding))
 
         def forward(self,D,L,S):
             """
             :param input: tuple of D,L,S
             :return: tuple of D, L, S
             """
-            input = (D,L,S)
-            components = self.ista1(input)
-            components = self.ista2(components)
-            components = self.ista3(components)
-            components = self.ista4(components)
-            components = self.ista5(components)
-            components = self.ista6(components)
-            components = self.ista7(components)
-            components = self.ista8(components)
-            # components = self.ista9(components)
-            # components = self.ista10(components)
-
+            components = (D,L,S)
+            for layer in self.layers:
+                components = layer(components)
             (D,L,S) = components
 
             return torch.cat((L,S),1)
