@@ -7,6 +7,8 @@ from model import IstaNet
 from torch.utils.tensorboard import SummaryWriter
 from tensorboard_helper import plot_classes_preds
 from skimage.transform import rescale
+import argparse
+import yaml
 
 
 def load_data(path, n_frames = 30, rescale_factor = 1):
@@ -30,8 +32,25 @@ def load_data(path, n_frames = 30, rescale_factor = 1):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-yaml", help="path of yaml file", type=str)
+    args = parser.parse_args()
+    yampl_path = args.yaml
+
+    with open(yampl_path) as file:
+        setup_dict = yaml.load(file,Loader=yaml.FullLoader)
+    train_path = setup_dict['train_path'][0]
+    test_path = setup_dict['test_path'][0]
+    n_layers = setup_dict['n_layers'][0]
+    try_gpu = setup_dict['try_gpu'][0]
+    writer_dir = setup_dict['writer'][0]
+
     # check if CUDA is available
-    train_on_gpu = torch.cuda.is_available()
+    if try_gpu:
+        train_on_gpu = torch.cuda.is_available()
+    else:
+        train_on_gpu = False
+
     device = torch.device("cuda" if train_on_gpu else "cpu")
     if not train_on_gpu:
         print('CUDA is not available.  Training on CPU ...')
@@ -39,18 +58,18 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D_train,L_train_target,S_train_target = load_data('/home/spencer/research/radar-rgb-bfs/output/csl_lobby_700',rescale_factor=.125)
+    D_train,L_train_target,S_train_target = load_data(train_path,rescale_factor=.125)
     target_train = torch.cat((L_train_target,S_train_target),1)  # concatenate the L and S in the channel dimension
 
-    D_test, L_test_target, S_test_target = load_data('/home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0', rescale_factor=.125)
+    D_test, L_test_target, S_test_target = load_data(test_path, rescale_factor=.125)
     target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
 
     # Destination for tensorboard log data
-    writer = SummaryWriter('runs/blah')
+    writer = SummaryWriter('runs/'+writer_dir)
 
     # init model
     # (n_frames,n_channels,im_height,im_width) = D_train.shape
-    model = IstaNet(D_train.shape,8)
+    model = IstaNet(D_train.shape,n_layers)
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
@@ -125,8 +144,6 @@ if __name__ == '__main__':
 
         # show sample predictions
         if epoch % 20:
-            # if train_on_gpu:
-                # output = output.cpu(), L_train_target.cpu()
             writer.add_figure('predictions vs. actuals TRAIN',
                           plot_classes_preds(output.cpu().detach().numpy(),L_train_target.cpu().numpy(),S_train_target.cpu().numpy()),
                           global_step=epoch)

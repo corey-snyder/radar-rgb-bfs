@@ -1,0 +1,10 @@
+train_path:
+  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
+test_path:
+  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
+n_layers:
+  - 8
+try_gpu:
+  - True
+writer:
+  - blah

@@ -38,13 +38,13 @@ def plot_func(output,D):
 
 if __name__ == '__main__':
 
-    D, L_target, S_target = load_data('/home/spencer/research/radar-rgb-bfs/output/eceb_lobby')
+    D, L_target, S_target = load_data('/home/spencer/research/radar-rgb-bfs/output/csl_pantry')
     L_test = torch.zeros_like(D)
     S_test = torch.zeros_like(D)
 
 
     (n_frames,n_channels,im_height,im_width) = D.shape
-    model = IstaNet(im_height,im_width)
+    model = IstaNet(D.shape,8)
     model.load_state_dict(torch.load('/home/spencer/research/radar-rgb-bfs/NN/baseline/model_bfs.pt'))
     model.eval()
 
