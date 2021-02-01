@@ -1,0 +1,9 @@
+net_path:
+  - model_bfs.pt
+test_path:
+  #- /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
+  - ../../output/eceb_lobby
+n_layers:
+  - 12
+try_gpu:
+  - True

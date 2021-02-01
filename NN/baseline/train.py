@@ -9,9 +9,10 @@ from tensorboard_helper import plot_classes_preds
 from skimage.transform import rescale
 import argparse
 import yaml
+from datetime import datetime
 
 
-def load_data(path, n_frames = 30, rescale_factor = 1):
+def load_data(path, n_frames = 30, rescale_factor = 1.):
 
     D = np.load(path + '/D.npy')
     L = np.load(path + '/L_pcp.npy')
@@ -65,7 +66,9 @@ if __name__ == '__main__':
     target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
 
     # Destination for tensorboard log data
-    writer = SummaryWriter('runs/'+writer_dir)
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
+    writer = SummaryWriter('runs/'+writer_dir+'__'+dt_string)
 
     # init model
     # (n_frames,n_channels,im_height,im_width) = D_train.shape
@@ -125,22 +128,22 @@ if __name__ == '__main__':
         (n_frames, n_channels, im_height, im_width) = D_train.shape
         L_flat = torch.reshape(output[:,0], (-1, im_height * im_width)).T
         (u, s, v) = torch.svd(L_flat)
-        s_dict = {}
-        for idx, ii in enumerate(s):
-            s_dict[str(idx)] = s[idx].item()
-        writer.add_scalars('sing. vals of L', s_dict,epoch)
-        writer.close()
+        # s_dict = {}
+        # for idx, ii in enumerate(s):
+        #     s_dict[str(idx)] = s[idx].item()
+        # writer.add_scalars('sing. vals of L', s_dict,epoch)
+        # writer.close()
 
         # add rank of L to tensorboard
         writer.add_scalar('rank of L', sum(s>1e-4),epoch)
 
-        # add lambda1 (SVD lambda)
-        writer.add_scalar('Lambda1 (SVD) in last layer', model.layers[-1].lambda1.item(), epoch)
-        writer.close()
-
-        # add lambda2 (Shrink S)
-        writer.add_scalar('Lambda2 Shrink S in last layer', model.layers[-1].lambda2.item(), epoch)
-        writer.close()
+        # # add lambda1 (SVD lambda)
+        # writer.add_scalar('Lambda1 (SVD) in last layer', model.layers[-1].lambda1.item(), epoch)
+        # writer.close()
+        #
+        # # add lambda2 (Shrink S)
+        # writer.add_scalar('Lambda2 Shrink S in last layer', model.layers[-1].lambda2.item(), epoch)
+        # writer.close()
 
         # show sample predictions
         if epoch % 20:
