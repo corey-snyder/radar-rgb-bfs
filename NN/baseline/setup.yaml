@@ -1,10 +1,10 @@
 train_path:
-  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 test_path:
-  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
 n_layers:
-  - 8
+  - 12
 try_gpu:
   - True
 writer:
-  - blah
+  - 12_layers_001lr_2_over_mu

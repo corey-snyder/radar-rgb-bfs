@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
     # specify optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     # scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=.75,step_size=75)
 
     # tensorboard graph
