@@ -23,8 +23,3 @@ if __name__ == '__main__':
     S = S.T.reshape(n_frames,im_height,im_width)
     np.save(output_dir + '/S_test.npy',S)
     np.save(output_dir + '/L_test.npy',L)
-
-    pass
-    # yaml will aslo have # iterations
-    # then look at notebook for saving
-    # learn vim
