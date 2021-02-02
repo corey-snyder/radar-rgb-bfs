@@ -18,8 +18,8 @@ if __name__ == '__main__':
     D = np.load(input_path)
     n_frames, im_height, im_width = D.shape
     D = D.reshape(n_frames,-1).T
-    L, S, (u, s, v), errors, ranks, nnzs = pcp(D,maxiter=n_iterations)
+    L, S, (u, s, v), errors, ranks, nnzs = pcp(D,maxiter=n_iterations, verbose=True)
     L = L.T.reshape(n_frames,im_height,im_width)
     S = S.T.reshape(n_frames,im_height,im_width)
-    np.save(output_dir + '/S_test.npy',S)
-    np.save(output_dir + '/L_test.npy',L)
+    np.save(output_dir + '/S_pcp.npy',S)
+    np.save(output_dir + '/L_pcp.npy',L)
