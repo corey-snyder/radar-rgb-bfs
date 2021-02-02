@@ -59,9 +59,9 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if train_on_gpu else "cpu")
     if not train_on_gpu:
-        print('CUDA is not available.  Training on CPU ...')
+        print('CUDA is not available.  Testing on CPU ...')
     else:
-        print('CUDA is available!  Training on GPU ...')
+        print('CUDA is available!  Testing on GPU ...')
 
     D, L_target, S_target = load_data(test_path,rescale_factor=.125)
     L_test = torch.zeros_like(D)
