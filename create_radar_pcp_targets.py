@@ -60,13 +60,13 @@ if __name__ == '__main__':
         mean = test_radar_cube.mean(0)
         test_radar_cube = test_radar_cube - mean
 
-        (test_log_doppler_cube, test_doppler_cube) = mm.dsp.doppler_processing(test_radar_cube,
-                                                                               num_tx_antennas=iwr_cfg_dict['numTx'], clutter_removal_enabled=False,
-                                                                               interleaved=False, window_type_2d=mm.dsp.utils.Window.HAMMING,
-                                                                               accumulate=False, phase_correction=True)
-
-        test_doppler_cube = np.fft.fftshift(test_doppler_cube, axes=(2,))
-        test_log_doppler_cube = np.fft.fftshift(test_log_doppler_cube, axes=(2,))
+        # (test_log_doppler_cube, test_doppler_cube) = mm.dsp.doppler_processing(test_radar_cube,
+        #                                                                        num_tx_antennas=iwr_cfg_dict['numTx'], clutter_removal_enabled=False,
+        #                                                                        interleaved=False, window_type_2d=mm.dsp.utils.Window.HAMMING,
+        #                                                                        accumulate=False, phase_correction=True)
+        #
+        # test_doppler_cube = np.fft.fftshift(test_doppler_cube, axes=(2,))
+        # test_log_doppler_cube = np.fft.fftshift(test_log_doppler_cube, axes=(2,))
 
         # plt.figure(figsize=(15, 5))
         # plt.suptitle('Frame %d' % ii)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         beamforming_result = np.zeros([n_range_bins, n_angle_bins], dtype=np.complex_)  # range bins x angle bins
 
         for jj in range(n_range_bins):
-            beamforming_result[jj, :], _ = mm.dsp.aoa_capon(test_doppler_cube[jj], steering_vec)
+            beamforming_result[jj, :], _ = mm.dsp.aoa_capon(test_radar_cube.T[jj], steering_vec)
         beamforming_result = np.flip(beamforming_result,axis=1)
 
         radar_range_azs.append(beamforming_result)
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         # plt.pcolormesh(theta, r, np.log(np.abs(values)))
         # plt.grid()
         # plt.xlim([0, np.pi])
-        plt.show()
+        # plt.show()
 
     radar_az_amps = [np.sum(np.abs(r_a), axis=0) for r_a in radar_range_azs]
     radar_az_log_amps = [np.log(a_a) for a_a in radar_az_amps]
@@ -131,10 +131,10 @@ if __name__ == '__main__':
     pixel_amplitudes -= np.min(pixel_amplitudes)
     pixel_amplitudes /= np.max(pixel_amplitudes)
     pixel_cost_amplitudes = pixel_amplitudes * (u_bound - l_bound) + l_bound
-    # for ii in pixel_cost_amplitudes:
-    #     plt.plot(ii)
-    #     plt.title('$\gamma$ for each column of image')
-    #     plt.show()
+    for ii in pixel_cost_amplitudes:
+        plt.plot(ii)
+        plt.title('$\gamma$ for each column of image')
+        plt.show()
 
     M_F = pixel_cost_amplitudes[:, :, np.newaxis] * np.ones((n_frames, im_width, im_height))
     M_F = np.swapaxes(M_F, 1, 2).reshape(n_frames, -1)
