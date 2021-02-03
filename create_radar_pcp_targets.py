@@ -6,20 +6,20 @@ import pickle
 import sys
 import matplotlib.pyplot as plt
 from scipy import interpolate
-sys.path.insert(1,'/home/spencer/research/OpenRadar') # needed to import openradar not in folder
+sys.path.insert(1,'/home/smarkowitz/open-radar') # needed to import openradar not in folder
 import mmwave as mm
 
 
 if __name__ == '__main__':
-
+    # python create_radar_pcp_targets.py -rgb_input /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/D.npy -radar_input /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames.txt -iterations 5
     parser = argparse.ArgumentParser()
     parser.add_argument("-rgb_input", help="path of input file", type=str)
     parser.add_argument("-radar_input", help="path to radar input", type=str)
     parser.add_argument("-max_shrink",default=1.1, help="max shrinkage value > 1",type=float)
     parser.add_argument("-min_shrink",default=.9, help="min shrinkage value < 1",type=float)
     parser.add_argument("-iterations", help="max number of iteration for PCP", type=int)
-    parser.add_argument("-camera_mat",help="path to camera matrix to get azimuth angle to pixel location")
-    parser.add_argument("-radar_cfg", help="path to radar config file for radar processing",type=str)
+    parser.add_argument("-camera_mat", default="/home/smarkowitz/open-radar/f_matrix.npy", help="path to camera matrix to get azimuth angle to pixel location")
+    parser.add_argument("-radar_cfg", default="/home/smarkowitz/open-radar/indoor_human_rcs.cfg", help="path to radar config file for radar processing",type=str)
 
     args = parser.parse_args()
     rgb_input_path = args.rgb_input
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     n_iterations = args.iterations
     camera_mat_path = args.camera_mat
     cfg_path = args.radar_cfg
-
+    print('Shrink ' + str(max_shrink) + ' ' + str(min_shrink))
 
     output_dir = str(Path(rgb_input_path).parent)
 
@@ -131,10 +131,10 @@ if __name__ == '__main__':
     pixel_amplitudes -= np.min(pixel_amplitudes)
     pixel_amplitudes /= np.max(pixel_amplitudes)
     pixel_cost_amplitudes = pixel_amplitudes * (u_bound - l_bound) + l_bound
-    for ii in pixel_cost_amplitudes:
-        plt.plot(ii)
-        plt.title('$\gamma$ for each column of image')
-        plt.show()
+    # for ii in pixel_cost_amplitudes:
+    #     plt.plot(ii)
+    #     plt.title('$\gamma$ for each column of image')
+    #     plt.show()
 
     M_F = pixel_cost_amplitudes[:, :, np.newaxis] * np.ones((n_frames, im_width, im_height))
     M_F = np.swapaxes(M_F, 1, 2).reshape(n_frames, -1)
