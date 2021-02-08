@@ -117,7 +117,7 @@ if __name__ == '__main__':
         # plt.plot((pixel_amps) * 200, '--', c='lime', linewidth=4)
         # plt.show()
 
-    np.save(radar_data_name+'_likelihood.npy',np.array(pixel_amplitudes))
+    np.save(output_dir + '/'+ radar_data_name+'_likelihood.npy',np.array(pixel_amplitudes))
 
 
 
