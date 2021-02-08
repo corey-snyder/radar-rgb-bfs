@@ -117,9 +117,8 @@ if __name__ == '__main__':
         # plt.plot((pixel_amps) * 200, '--', c='lime', linewidth=4)
         # plt.show()
 
-    pass
-    with open(radar_data_name+'_likelihood.pkl', 'wb') as f:
-        pickle.dump(pixel_amplitudes, f)
+    np.save(radar_data_name+'_likelihood.npy',np.array(pixel_amplitudes))
+
 
 
 
