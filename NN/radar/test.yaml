@@ -3,6 +3,8 @@ net_path:
 test_path:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
   #- ../../output/eceb_lobby
+test_radar_input:
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby/radar_frames_eceb_lobby_likelihood.npy
 n_layers:
   - 12
 try_gpu:

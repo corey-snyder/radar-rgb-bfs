@@ -48,6 +48,7 @@ if __name__ == '__main__':
         setup_dict = yaml.load(file, Loader=yaml.FullLoader)
     net_path = setup_dict['net_path'][0]
     test_path = setup_dict['test_path'][0]
+    radar_data_test = setup_dict['test_radar_input'][0]
     n_layers = setup_dict['n_layers'][0]
     try_gpu = setup_dict['try_gpu'][0]
 
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     else:
         print('CUDA is available!  Testing on GPU ...')
 
-    D, L_target, S_target = load_data(test_path,rescale_factor=.125)
+    D, L_target, S_target, R = load_data(test_path, radar_data=radar_data_test, rescale_factor=.125)
     L_test = torch.zeros_like(D)
     S_test = torch.zeros_like(D)
 
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(net_path))
     model.eval()
 
-    output = model(D,L_test,S_test)
+    output = model(D,L_test,S_test,R)
     output = output.detach().numpy()
     D = D.detach().numpy()
 

@@ -7,4 +7,4 @@ n_layers:
 try_gpu:
   - True
 writer:
-  - 12_layers_001lr_2_over_mu
+  - 12_layers_005lr_2_over_mu

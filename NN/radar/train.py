@@ -75,7 +75,7 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    writer = SummaryWriter('runs/'+writer_dir+'__'+dt_string)
+    writer = SummaryWriter('../runs/'+writer_dir+'__'+dt_string)
 
     # init model
     # (n_frames,n_channels,im_height,im_width) = D_train.shape
@@ -164,7 +164,7 @@ if __name__ == '__main__':
         ######################
         # validate the model #
         ######################
-        if epoch % 10 == 0:
+        if epoch % 20 == 0:
             model.eval()
 
             L_test = torch.zeros_like(D_test)

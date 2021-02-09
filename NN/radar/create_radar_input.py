@@ -1,4 +1,3 @@
-from pcp import radar_pcp
 import numpy as np
 import argparse
 from pathlib import Path
@@ -6,8 +5,8 @@ import pickle
 import sys
 import matplotlib.pyplot as plt
 from scipy import interpolate
-# sys.path.insert(1,'/home/smarkowitz/open-radar') # needed to import openradar not in folder
-sys.path.insert(1,'/home/spencer/research/OpenRadar') # needed to import openradar not in folder
+sys.path.insert(1,'/home/smarkowitz/open-radar') # needed to import openradar not in folder
+#sys.path.insert(1,'/home/spencer/research/OpenRadar') # needed to import openradar not in folder
 import mmwave as mm
 
 

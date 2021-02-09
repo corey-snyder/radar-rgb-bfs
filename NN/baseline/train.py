@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    writer = SummaryWriter('runs/'+writer_dir+'__'+dt_string)
+    writer = SummaryWriter('../runs/'+writer_dir+'__'+dt_string)
 
     # init model
     # (n_frames,n_channels,im_height,im_width) = D_train.shape
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
     # specify optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.005)
     # scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=.75,step_size=75)
 
     # tensorboard graph
