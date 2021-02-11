@@ -1,9 +1,9 @@
-net_path:
-  - model_bfs.pt
+run_path:
+  - /home/spencer/research/radar-rgb-bfs/NN/runs/OG_l8_lr_0.005_ds_0.125__11-02-2021_12-18-26
 test_path:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
-  #- ../../output/eceb_lobby
-n_layers:
-  - 12
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
+  - ../../output/eceb_lobby
 try_gpu:
   - True
+GT:
+  - /home/spencer/research/radar-rgb-bfs/RGB_images/groundtruth

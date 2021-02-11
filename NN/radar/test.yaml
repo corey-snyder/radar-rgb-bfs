@@ -1,11 +1,10 @@
-net_path:
-  - model_bfs.pt
+run_path:
+  - /home/spencer/research/radar-rgb-bfs/NN/runs/RADAR_l8_lr_0.005_ds_0.125__11-02-2021_12-12-51
 test_path:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
-  #- ../../output/eceb_lobby
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
+  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_0
 test_radar_input:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby/radar_frames_eceb_lobby_likelihood.npy
-n_layers:
-  - 12
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby/radar_frames_eceb_lobby_likelihood.npy
+  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_0_likelihood.npy
 try_gpu:
   - True
