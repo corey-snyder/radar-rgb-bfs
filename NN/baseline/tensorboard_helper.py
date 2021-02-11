@@ -16,18 +16,20 @@ def plot_classes_preds(output,L, S):
     S_pred = output[:,1]
 
     # plot the images in the batch, along with predicted and true labels
-    fig = plt.figure(figsize=(12, 48))
+    fig = plt.figure(figsize=(12, 25))
+    # plt.suptitle("Original Results")
     for idx,frame in enumerate(np.arange(0,30,3)):
         ax = fig.add_subplot(10, 4, idx*4 + 1, xticks=[], yticks=[])
         plt.imshow(L[frame, 0],cmap='gray')
-        plt.title('L Target')
+        if idx==0: plt.title('L Target')
         ax = fig.add_subplot(10, 4, idx*4 + 2, xticks=[], yticks=[])
         plt.imshow(L_pred[frame],cmap='gray')
-        plt.title('L Prediction')
+        if idx==0: plt.title('L Prediction')
         ax = fig.add_subplot(10, 4, idx*4 + 3, xticks=[], yticks=[])
         plt.imshow(S[frame,0],cmap='gray')
-        plt.title('S Target')
+        if idx==0: plt.title('S Target')
         ax = fig.add_subplot(10, 4, idx*4 + 4, xticks=[], yticks=[])
         plt.imshow(S_pred[frame],cmap='gray')
-        plt.title('S Prediction')
+        if idx==0: plt.title('S Prediction')
+    plt.tight_layout()
     return fig

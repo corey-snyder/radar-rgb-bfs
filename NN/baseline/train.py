@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,6 +9,7 @@ from skimage.transform import rescale
 import argparse
 import yaml
 from datetime import datetime
+import shutil
 
 
 def load_data(path, n_frames = 30, rescale_factor = 1.):
@@ -33,6 +33,8 @@ def load_data(path, n_frames = 30, rescale_factor = 1.):
 
 
 if __name__ == '__main__':
+    torch.manual_seed(17761948)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
     args = parser.parse_args()
@@ -44,7 +46,11 @@ if __name__ == '__main__':
     test_path = setup_dict['test_path'][0]
     n_layers = setup_dict['n_layers'][0]
     try_gpu = setup_dict['try_gpu'][0]
-    writer_dir = setup_dict['writer'][0]
+    downsample_rate = setup_dict['downsample'][0]
+    learning_rate = setup_dict['lr'][0]
+    schedule_step = setup_dict['schedule_step'][0]
+    schedule_multiplier = setup_dict['schedule_multiplier'][0]
+
 
     # check if CUDA is available
     if try_gpu:
@@ -59,26 +65,29 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D_train,L_train_target,S_train_target = load_data(train_path,rescale_factor=.125)
+    D_train,L_train_target,S_train_target = load_data(train_path,rescale_factor=downsample_rate)
     target_train = torch.cat((L_train_target,S_train_target),1)  # concatenate the L and S in the channel dimension
 
-    D_test, L_test_target, S_test_target = load_data(test_path, rescale_factor=.125)
+    D_test, L_test_target, S_test_target = load_data(test_path, rescale_factor=downsample_rate)
     target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
 
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    writer = SummaryWriter('../runs/'+writer_dir+'__'+dt_string)
+    log_name = 'OG_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate)
+    log_dir = '../runs/'+log_name+'__'+dt_string
+    writer = SummaryWriter(log_dir)
+    shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
+
 
     # init model
-    # (n_frames,n_channels,im_height,im_width) = D_train.shape
     model = IstaNet(D_train.shape,n_layers)
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
     # specify optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.005)
-    # scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=.75,step_size=75)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step)
 
     # tensorboard graph
     writer.add_graph(model,(D_train.to(device),D_train.to(device),D_train.to(device)))
@@ -136,6 +145,7 @@ if __name__ == '__main__':
 
         # add rank of L to tensorboard
         writer.add_scalar('rank of L', sum(s>1e-4),epoch)
+        writer.close()
 
         # # add lambda1 (SVD lambda)
         # writer.add_scalar('Lambda1 (SVD) in last layer', model.layers[-1].lambda1.item(), epoch)
@@ -146,16 +156,18 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 20:
+        if epoch % 25 ==0:
             writer.add_figure('predictions vs. actuals TRAIN',
                           plot_classes_preds(output.cpu().detach().numpy(),L_train_target.cpu().numpy(),S_train_target.cpu().numpy()),
                           global_step=epoch)
             writer.close()
 
-        ######################
-        # validate the model #
-        ######################
-        if epoch % 20 == 0:
+            # memory saver
+            del L_train, S_train, L_flat, u, s, v
+
+            ######################
+            # validate the model #
+            ######################
             model.eval()
 
             L_test = torch.zeros_like(D_test)
@@ -173,20 +185,28 @@ if __name__ == '__main__':
             writer.add_figure('predictions vs. actuals TEST',
                               plot_classes_preds(output_test.cpu().detach().numpy(), L_test_target.cpu().numpy(), S_test_target.numpy()),
                               global_step=epoch)
-            del output_test,loss
             writer.close()
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
                 epoch, train_loss, valid_loss))
+
+            # save model if validation loss has decreased
+            if (valid_loss <= valid_loss_min) and (valid_loss != 0):
+                print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
+                    valid_loss_min,
+                    valid_loss))
+                torch.save(model.state_dict(), log_dir + '/model_bfs.pt')
+                valid_loss_min = valid_loss
+
+            # add test loss in tensorboard
+            writer.add_scalar('test pixel loss',
+                              loss.item(),
+                              epoch)
+            writer.close()
+
+            del output_test, loss, L_test, S_test
         else:
             print('Epoch: {} \tTraining Loss: {:.6f}'.format(
                 epoch, train_loss))
 
-        # save model if validation loss has decreased
-        if (valid_loss <= valid_loss_min) and (valid_loss != 0):
-            print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
-                valid_loss_min,
-                valid_loss))
-            torch.save(model.state_dict(), 'model_bfs.pt')
-            valid_loss_min = valid_loss
 
-        # scheduler.step()
+        scheduler.step()
