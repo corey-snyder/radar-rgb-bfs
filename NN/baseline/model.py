@@ -23,12 +23,12 @@ class IstaLayer(nn.Module):
         self.im_height = im_height
         self.im_width = im_width
 
-        self.p1 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
-        self.p2 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
-        self.p3 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
-        self.p4 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
-        self.p5 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
-        self.p6 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding)
+        self.p1 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
+        self.p2 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
+        self.p3 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
+        self.p4 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
+        self.p5 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
+        self.p6 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=kernel_size,padding=padding, padding_mode='reflect')
 
         lambda_from_pcp = 1/np.sqrt(im_height*im_width) # sqrt of len of vectorized image
         mu = .5  # assume mean abs value of input is .5

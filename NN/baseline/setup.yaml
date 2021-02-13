@@ -7,12 +7,16 @@ test_path:
 n_layers:
   - 8
 downsample:
-  - .125
+  - .25
 try_gpu:
   - True
 lr:
-  - .005
+  - .002
 schedule_step:
-  - 500
+  - 2000
 schedule_multiplier:
   - .25
+patch_height:
+  - 80
+patch_width:
+  - 80
