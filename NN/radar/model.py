@@ -23,13 +23,13 @@ class IstaLayer(nn.Module):
         self.im_height = im_height
         self.im_width = im_width
 
-        self.p1 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p2 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p3 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p4 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p5 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p6 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding)
-        self.p7 = nn.Conv1d(in_channels=1,out_channels=1,kernel_size=radar_kernel_size,padding=radar_padding)
+        self.p1 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p2 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p3 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p4 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p5 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p6 = nn.Conv2d(in_channels=im_channels,out_channels=im_channels,kernel_size=im_kernel_size,padding=im_padding, padding_mode='reflect')
+        self.p7 = nn.Conv1d(in_channels=1,out_channels=1,kernel_size=radar_kernel_size,padding=radar_padding, padding_mode='reflect')
         lambda_from_pcp = 1/np.sqrt(im_height*im_width) # sqrt of len of vectorized image
         mu = .5  # assume mean abs value of input is .5
 

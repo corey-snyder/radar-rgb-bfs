@@ -11,6 +11,8 @@ import yaml
 from datetime import datetime
 import shutil
 
+import matplotlib.pyplot as plt
+
 
 def load_data(path, radar_data, n_frames = 30, rescale_factor = 1.):
 
@@ -36,8 +38,108 @@ def load_data(path, radar_data, n_frames = 30, rescale_factor = 1.):
     return torch.from_numpy(D).float(), torch.from_numpy(L).float(), torch.from_numpy(S).float(), torch.from_numpy(R).float()
 
 
+def random_crop(D, R, target, patch_shape):
+    (full_height, full_width) = D.shape[-2:]
+    (patch_height, patch_width) = patch_shape
+
+    # assuming coordinates belong to center of the patch so we have to be side_len/2 away from boundary
+    height_range = (patch_height//2,full_height-patch_height//2)
+    width_range = (patch_width//2,full_width-patch_width//2)
+
+    rand_height = np.random.choice(np.arange(height_range[0],height_range[1]))
+    rand_width = np.random.choice(np.arange(width_range[0],width_range[1]))
+
+    # Extracting Patch
+    D_patch = D[:,:,rand_height-patch_height//2: rand_height+patch_height//2,
+                    rand_width-patch_width//2: rand_width+patch_width//2]
+    target_patch = target[:,:,rand_height-patch_height//2:rand_height+patch_height//2,
+                              rand_width-patch_width//2:rand_width+patch_width//2]
+    R_patch = R[:,:,rand_width-patch_width//2: rand_width+patch_width//2]
+
+    return D_patch, R_patch, target_patch
+
+
+def pad_mat(og_rgb_input, og_radar_input, patch_shape, step_shape):
+    (_, _, og_height, og_width) = og_rgb_input.shape
+    (height_step, width_step) = step_shape
+    (patch_height, patch_width) = patch_shape
+
+    # determine height padding amount
+    new_height = patch_height
+    while new_height < og_height:
+        new_height += height_step
+
+    # determine width padding amount
+    new_width = patch_width
+    while new_width < og_width:
+        new_width += width_step
+
+    height_pad_len = new_height-og_height
+    width_pad_len = new_width-og_width
+
+    pad_2d = torch.nn.ZeroPad2d((0,width_pad_len,0, height_pad_len))
+    pad_1d = torch.nn.ConstantPad1d(width_pad_len,0)
+
+    padded_rgb_input = pad_2d(og_rgb_input)
+    padded_radar_input = pad_1d(og_radar_input)
+
+    return padded_rgb_input, padded_radar_input
+
+
+def infer_full_image(full_rgb_input, full_radar_input, network, patch_shape, step_shape, device):
+    torch.cuda.empty_cache()
+    (height_step, width_step) = step_shape
+    (patch_height,patch_width) = np.array(patch_shape[-2:])
+    (batch_size,channels,og_height, og_width) = full_rgb_input.shape
+
+    # determine padding (need to pad so that the size of the input is matches the patch/step size)
+    padded_rgb_input, padded_radar_input = pad_mat(full_rgb_input, full_radar_input, (patch_height,patch_width),(height_step, width_step))
+
+    patches_rgb = padded_rgb_input.unfold(2, size=int(patch_height), step=int(height_step)).unfold(3, size=int(patch_width), step=int(width_step))
+    patches_radar = padded_radar_input.unfold(2, size=int(patch_width), step=int(width_step))
+    patches_out = torch.zeros((batch_size, 2, patches_rgb.shape[2], patches_rgb.shape[3], patch_height, patch_width)).to(device)
+    for ii in range(patches_rgb.shape[2]):
+        for jj in range(patches_rgb.shape[3]):
+            patch_rgb_input = patches_rgb[:,:,ii,jj].to(device)
+            patch_radar_input = patches_radar[:,:,jj].to(device)
+            L_patch_input = torch.zeros_like(patch_rgb_input).to(device)
+            S_patch_input = torch.zeros_like(patch_rgb_input).to(device)
+            patches_out[:,:,ii,jj] = network(patch_rgb_input, L_patch_input, S_patch_input, patch_radar_input)
+
+    # fold data
+    # reshape output to match F.fold input
+    patches_out = patches_out.contiguous().view(batch_size, 2, -1, patch_height*patch_width)
+    # print(patches_out.shape)  # [B, C, nb_patches_all, kernel_size*kernel_size]
+    patches_out = patches_out.permute(0, 1, 3, 2)
+    # print(patches_out.shape)  # [B, C, kernel_size*kernel_size, nb_patches_all]
+    patches_out = patches_out.contiguous().view(batch_size, 2 * patch_height * patch_width, -1)
+    # print(patches_out.shape)  # [B, C*prod(kernel_size), L] as expected by Fold
+    # https://pytorch.org/docs/stable/nn.html#torch.nn.Fold
+
+    fold = torch.nn.Fold(output_size=padded_rgb_input.shape[-2:], kernel_size=(patch_height, patch_width), stride=(height_step, width_step))
+    padded_output = fold(patches_out)
+    # print(output.shape)  # [B, C, H, W]
+
+
+    # fold ones
+    ones_tensor = torch.ones_like(patches_out).to(device)
+
+    # memory saver
+    del L_patch_input, S_patch_input, patch_radar_input, patches_out
+    torch.cuda.empty_cache()
+
+    ones_tensor = fold(ones_tensor)
+
+    # data /ones
+    padded_output = padded_output / ones_tensor
+    full_output = padded_output[:,:,:og_height,:og_width].to(device)
+
+    return full_output
+
+
 if __name__ == '__main__':
     torch.manual_seed(17761948)
+    np.random.seed(17761948)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
@@ -47,15 +149,17 @@ if __name__ == '__main__':
     with open(yampl_path) as file:
         setup_dict = yaml.load(file,Loader=yaml.FullLoader)
     train_path = setup_dict['train_path'][0]
-    radar_data_train = setup_dict['train_radar_input'][0]
+    radar_data_train_full = setup_dict['train_radar_input'][0]
     test_path = setup_dict['test_path'][0]
-    radar_data_test = setup_dict['test_radar_input'][0]
+    radar_data_test_full = setup_dict['test_radar_input'][0]
     n_layers = setup_dict['n_layers'][0]
     try_gpu = setup_dict['try_gpu'][0]
-    downsample_rate = setup_dict['downsample'][0]
+    downsample_rate = setup_dict['downsample'][0]  # in each dim
     learning_rate = setup_dict['lr'][0]
     schedule_step = setup_dict['schedule_step'][0]
-    schedule_multiplier = setup_dict['schedule_multiplier'][0]
+    schedule_multiplier = setup_dict['schedule_multiplier'][0]  # <1
+    patch_height = setup_dict['patch_height'][0]
+    patch_width = setup_dict['patch_width'][0]
 
     # check if CUDA is available
     if try_gpu:
@@ -70,11 +174,15 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D_train,L_train_target,S_train_target, R_train = load_data(train_path, radar_data=radar_data_train, rescale_factor=downsample_rate)
-    target_train = torch.cat((L_train_target,S_train_target),1)  # concatenate the L and S in the channel dimension
+    D_train_full,L_train_full_target,S_train_full_target, R_train_full = load_data(train_path,
+                                                                                   radar_data=radar_data_train_full, rescale_factor=downsample_rate)
+    target_train_full = torch.cat((L_train_full_target, S_train_full_target),1)  # concatenate the L and S in the channel dimension
+    D_train_full.to(device)
 
-    D_test, L_test_target, S_test_target, R_test = load_data(test_path, radar_data=radar_data_test, rescale_factor=downsample_rate)
-    target_test = torch.cat((L_test_target, S_test_target), 1)  # concatenate the L and S in the channel dimension
+    D_test_full, L_test_full_target, S_test_full_target, R_test_full = load_data(test_path,
+                                                                                 radar_data=radar_data_test_full, rescale_factor=downsample_rate)
+    target_test_full = torch.cat((L_test_full_target, S_test_full_target), 1)  # concatenate the L and S in the channel dimension
+    D_test_full.to(device)
 
     # Destination for tensorboard log data
     now = datetime.now()
@@ -85,7 +193,8 @@ if __name__ == '__main__':
     shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
 
     # init model
-    model = IstaNet(D_train.shape,n_layers)
+    data_shape = list(np.concatenate([D_train_full.shape[:2],[patch_height,patch_width]]))
+    model = IstaNet(data_shape,n_layers)
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
@@ -94,13 +203,13 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step)
 
     # tensorboard graph
-    writer.add_graph(model,(D_train.to(device),D_train.to(device),D_train.to(device),R_train.to(device)))
-
+    writer.add_graph(model, (D_train_full[:,:,:patch_height,:patch_width].to(device),D_train_full[:,:,:patch_height,:patch_width].to(device),
+                            D_train_full[:,:,:patch_height,:patch_width].to(device),R_train_full[:,:,:patch_width].to(device)))
     writer.close()
 
     # train
 
-    n_epochs = 1000  # number of epochs to train the model
+    n_epochs = 10000  # number of epochs to train the model
     valid_loss_min = np.Inf  # track change in validation loss
 
     for epoch in range(1, n_epochs + 1):
@@ -117,14 +226,18 @@ if __name__ == '__main__':
         optimizer.zero_grad()
 
         # init L, S as zeros per PCP algorithm
-        L_train = torch.zeros_like(D_train)
-        S_train = torch.zeros_like(D_train)
-        D_train, L_train, S_train, target_train, R_train = D_train.to(device), L_train.to(device), S_train.to(device), target_train.to(device), R_train.to(device)
+        L_train_patch = torch.zeros(data_shape)
+        S_train_patch = torch.zeros(data_shape)
 
+        # get random crop
+        D_train_patch, R_train_patch, target_train_patch = random_crop(D_train_full,  R_train_full, target_train_full,(patch_height, patch_width))
+        # send tensors to device
+        D_train_patch, L_train_patch, S_train_patch, R_train_patch, target_train_patch = \
+            D_train_patch.to(device), L_train_patch.to(device), S_train_patch.to(device), R_train_patch.to(device), target_train_patch.to(device)
         # forward pass: compute predicted outputs by passing inputs to the model
-        output = model(D_train,L_train,S_train,R_train)
+        output = model(D_train_patch, L_train_patch, S_train_patch, R_train_patch)
         # calculate the batch loss
-        loss = criterion(output, target_train)
+        loss = criterion(output, target_train_patch)
         # backward pass: compute gradient of the loss with respect to model parameters
         loss.backward()
         # perform a single optimization step (parameter update)
@@ -132,23 +245,24 @@ if __name__ == '__main__':
         # update training loss
         train_loss += loss.item()
 
-        # add training loss in tensorboard
-        writer.add_scalar('training pixel loss',
+        # add training loss in tensorboard from patch
+        writer.add_scalar('Training Pixel loss Patch',
                           loss.item(),
                           epoch)
+        writer.close()
 
         # add values of singular values of L in tensorboard
-        (n_frames, n_channels, im_height, im_width) = D_train.shape
-        L_flat = torch.reshape(output[:,0], (-1, im_height * im_width)).T
-        (u, s, v) = torch.svd(L_flat)
-        # s_dict = {}
-        # for idx, ii in enumerate(s):
-        #     s_dict[str(idx)] = s[idx].item()
-        # writer.add_scalars('sing. vals of L', s_dict,epoch)
-        # writer.close()
+        # (n_frames, n_channels, im_height, im_width) = D_train.shape
+        # L_flat = torch.reshape(output[:,0], (-1, im_height * im_width)).T
+        # (u, s, v) = torch.svd(L_flat)
+        # # s_dict = {}
+        # # for idx, ii in enumerate(s):
+        # #     s_dict[str(idx)] = s[idx].item()
+        # # writer.add_scalars('sing. vals of L', s_dict,epoch)
+        # # writer.close()
 
         # add rank of L to tensorboard
-        writer.add_scalar('rank of L', sum(s>1e-4),epoch)
+        # writer.add_scalar('rank of L', sum(s>1e-4),epoch)
 
         # # add lambda1 (SVD lambda)
         # writer.add_scalar('Lambda1 (SVD) in last layer', model.layers[-1].lambda1.item(), epoch)
@@ -159,36 +273,48 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 25 == 0:
-            writer.add_figure('predictions vs. actuals TRAIN',
-                          plot_classes_preds(output.cpu().detach().numpy(),L_train_target.cpu().numpy(),S_train_target.cpu().numpy(),
-                          R_train.cpu().numpy()),global_step=epoch)
+        if epoch % 250 == 0:
+            # memory saver
+            del L_train_patch, S_train_patch, loss  # L_flat, u, s, v
+
+            model.eval()
+            step_shape = np.array(data_shape[-2:]) // 2
+            output_train_full = infer_full_image(D_train_full, R_train_full, model, data_shape, step_shape, device)
+
+            # compute pixel loss of entire image
+            target_train_full.to(device)
+            loss = criterion(output_train_full, target_train_full.to(device))
+            train_loss = loss.item()
+            writer.add_scalar('Training Pixel loss Full',
+                              loss.item(),
+                              epoch)
             writer.close()
 
-            # memory saver
-            del L_train, S_train, L_flat, u, s, v
+            writer.add_figure('predictions vs. actuals TRAIN',
+                              plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
+                                                 S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
+                              global_step=epoch)
+            writer.close()
+            del output_train_full, loss
 
             ######################
             # validate the model #
             ######################
-            model.eval()
 
-            L_test = torch.zeros_like(D_test)
-            S_test = torch.zeros_like(D_test)
-            # move tensors to GPU if CUDA is available
-            D_test, L_test, S_test, target_test, R_test = D_test.to(device), L_test.to(device), S_test.to(device), target_test.to(device), R_test.to(device)
-
-            # forward pass: compute predicted outputs by passing inputs to the model
-            output_test = model(D_test,L_test,S_test,R_test)
-            # calculate the batch loss
-            loss = criterion(output_test, target_test)
-            # update average validation loss
-            valid_loss += loss.item()
+            output_test_full = infer_full_image(D_test_full, R_test_full, model, data_shape, step_shape, device)
+            loss = criterion(output_test_full, target_test_full.to(device))
+            valid_loss = loss.item()
+            writer.add_scalar('Testing Pixel loss Full',
+                              loss.item(),
+                              epoch)
+            writer.close()
 
             writer.add_figure('predictions vs. actuals TEST',
-                              plot_classes_preds(output_test.cpu().detach().numpy(), L_test_target.cpu().numpy(), S_test_target.numpy(),
-                              R_test.cpu().numpy()), global_step=epoch)
+                              plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+                                                 S_test_full_target.cpu().numpy(), R_test_full.cpu().numpy()),
+                              global_step=epoch)
             writer.close()
+
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
                 epoch, train_loss, valid_loss))
 
@@ -200,17 +326,10 @@ if __name__ == '__main__':
                 torch.save(model.state_dict(), log_dir + '/model_bfs.pt')
                 valid_loss_min = valid_loss
 
-            # add test loss in tensorboard
-            writer.add_scalar('test pixel loss',
-                              loss.item(),
-                              epoch)
-            writer.close()
-            del output_test,loss, L_test, S_test
+            del output_test_full, loss
 
         else:
             print('Epoch: {} \tTraining Loss: {:.6f}'.format(
                 epoch, train_loss))
 
         scheduler.step()
-        # print('Epoch: {} \tTraining Loss: {:.6f}'.format(
-        #         epoch, train_loss))
