@@ -56,8 +56,8 @@ def random_crop(D, target, patch_shape):
 
 def pad_mat(og_input,patch_shape, step_shape):
     (_, _, og_height, og_width) = og_input.shape
-    (height_step, width_step) = patch_shape
-    (patch_height, patch_width) = step_shape
+    (height_step, width_step) = step_shape
+    (patch_height, patch_width) = patch_shape
 
     # determine height padding amount
     new_height = patch_height
@@ -173,7 +173,6 @@ if __name__ == '__main__':
     writer = SummaryWriter(log_dir)
     shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
 
-
     # init model
     data_shape = list(np.concatenate([D_train_full.shape[:2],[patch_height,patch_width]]))
     model = IstaNet(data_shape,n_layers)
@@ -250,7 +249,7 @@ if __name__ == '__main__':
         # show sample predictions
         if epoch % 250 ==0:
             # memory saver
-            del L_train_patch, S_train_patch #L_flat, u, s, v
+            del L_train_patch, S_train_patch, loss #L_flat, u, s, v
 
             model.eval()
             step_shape = np.array(data_shape[-2:])//2
@@ -282,6 +281,7 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             writer.close()
+
             writer.add_figure('predictions vs. actuals TEST',
                               plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
                                                  S_test_full_target.cpu().numpy()),
