@@ -113,6 +113,12 @@ def infer_full_image(full_input, network, patch_shape, step_shape, device):
 
     # fold ones
     ones_tensor = torch.ones_like(patches_out).to(device)
+    
+    # memory saver
+    del L_patch_input, S_patch_input, patches_out
+    torch.cuda.empty_cache()
+
+
     ones_tensor = fold(ones_tensor)
 
     # data /ones
@@ -190,7 +196,7 @@ if __name__ == '__main__':
 
     # train
 
-    n_epochs = 10000  # number of epochs to train the model
+    n_epochs = 50000  # number of epochs to train the model
     valid_loss_min = np.Inf  # track change in validation loss
 
     for epoch in range(1, n_epochs + 1):
