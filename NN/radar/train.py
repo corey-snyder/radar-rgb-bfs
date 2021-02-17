@@ -87,6 +87,7 @@ def pad_mat(og_rgb_input, og_radar_input, patch_shape, step_shape):
 
 
 def infer_full_image(full_rgb_input, full_radar_input, network, patch_shape, step_shape, device):
+    # https://discuss.pytorch.org/t/how-to-split-tensors-with-overlap-and-then-reconstruct-the-original-tensor/70261
     torch.cuda.empty_cache()
     (height_step, width_step) = step_shape
     (patch_height,patch_width) = np.array(patch_shape[-2:])
