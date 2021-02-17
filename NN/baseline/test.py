@@ -6,6 +6,9 @@ from train import load_data
 import argparse
 import yaml
 from train import infer_full_image
+import os
+from skimage.io import imread
+from evaluate import compute_metrics, display_results
 
 
 def plot_func(output,D):
@@ -92,16 +95,16 @@ if __name__ == '__main__':
 
     # Compute F-scores
 
-    # thresholds = [i * 0.05 for i in range(20)]
-    # filenames = os.listdir(gt_path)
-    # gt_images = []
-    # for ii in range(len(filenames)):
-    #     gt_images.append(imread(os.path.join(gt_path, 'rgb_%i.png'%ii)))
-    # if downsample_rate !=1:
-    #     gt_images = [gt_images[ii][::int(1/downsample_rate),::int(1/downsample_rate)] for ii in range(len(gt_images))]
-    # output_len = output.shape[0]
-    # gt_images = gt_images[:output_len]
-    # pred_images = [np.array(np.abs(output[ii,1])*255,dtype=np.uint8) for ii in range(output_len)]  # max abs val of float image is 1
-    #
-    # compute_metrics(gt_images, pred_images, thresholds, False)
-    # pass
+    thresholds = [i * 0.05 for i in range(20)]
+    filenames = os.listdir(gt_path)
+    gt_images = []
+    for ii in range(len(filenames)):
+        gt_images.append(imread(os.path.join(gt_path, 'rgb_%i.png'%ii)))
+    if downsample_rate !=1:
+        gt_images = [gt_images[ii][::int(1/downsample_rate),::int(1/downsample_rate)] for ii in range(len(gt_images))]
+    output_len = output.shape[0]
+    gt_images = gt_images[:output_len]
+    pred_images = [np.array(np.abs(output[ii,1])*255,dtype=np.uint8) for ii in range(output_len)]  # max abs val of float image is 1
+
+    results = compute_metrics(gt_images, pred_images, thresholds, False)
+    display_results(results)

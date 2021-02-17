@@ -6,7 +6,9 @@ from train import load_data
 import argparse
 import yaml
 from train import infer_full_image
-
+import os
+from skimage.io import imread
+from evaluate import compute_metrics, display_results
 
 
 def plot_func(output,D,R):
@@ -58,6 +60,12 @@ if __name__ == '__main__':
     step_height = setup_dict['step_height'][0]
     step_width = setup_dict['step_width'][0]
 
+    if 'GT' in setup_dict:
+        print('Testing F-score')
+        fscore_flag = True
+        gt_path = setup_dict['GT'][0]
+
+
     net_path = run_path + '/model_bfs.pt'
     yaml_train_path = run_path + '/setup.yaml'
 
@@ -94,3 +102,19 @@ if __name__ == '__main__':
     output, D, R = output.detach().cpu().numpy(), D.detach().cpu().numpy(), R.detach().cpu().numpy()
     plot_func(output,D,R)
     plt.show()
+
+    # Compute F-scores
+
+    thresholds = [i * 0.05 for i in range(20)]
+    filenames = os.listdir(gt_path)
+    gt_images = []
+    for ii in range(len(filenames)):
+        gt_images.append(imread(os.path.join(gt_path, 'rgb_%i.png'%ii)))
+    if downsample_rate !=1:
+        gt_images = [gt_images[ii][::int(1/downsample_rate),::int(1/downsample_rate)] for ii in range(len(gt_images))]
+    output_len = output.shape[0]
+    gt_images = gt_images[:output_len]
+    pred_images = [np.array(np.abs(output[ii,1])*255,dtype=np.uint8) for ii in range(output_len)]  # max abs val of float image is 1
+
+    results = compute_metrics(gt_images, pred_images, thresholds, False)
+    display_results(results)
