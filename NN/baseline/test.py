@@ -5,10 +5,7 @@ from model import IstaNet
 from train import load_data
 import argparse
 import yaml
-import os
-from skimage.io import imread
-from skimage.transform import rescale
-from evaluate import compute_metrics
+from train import infer_full_image
 
 
 def plot_func(output,D):
@@ -47,6 +44,9 @@ if __name__ == '__main__':
     run_path = setup_dict['run_path'][0]
     test_path = setup_dict['test_path'][0]
     try_gpu = setup_dict['try_gpu'][0]
+    step_height = setup_dict['step_height'][0]
+    step_width = setup_dict['step_width'][0]
+
     if 'GT' in setup_dict:
         print('Testing F-score')
         fscore_flag = True
@@ -59,6 +59,8 @@ if __name__ == '__main__':
         setup_dict = yaml.load(file, Loader=yaml.FullLoader)
     n_layers = setup_dict['n_layers'][0]
     downsample_rate = setup_dict['downsample'][0]
+    patch_height = setup_dict['patch_height'][0]
+    patch_width = setup_dict['patch_width'][0]
 
     # check if CUDA is available
     if try_gpu:
@@ -73,18 +75,16 @@ if __name__ == '__main__':
         print('CUDA is available!  Testing on GPU ...')
 
     D, L_target, S_target = load_data(test_path,rescale_factor=downsample_rate)
-    L_test = torch.zeros_like(D)
-    S_test = torch.zeros_like(D)
-    # move tensors to GPU if CUDA is available
-    D, L_test, S_test = D.to(device), L_test.to(device), S_test.to(device)
+    data_shape = list(np.concatenate([D.shape[:2],[patch_height,patch_width]]))
+    step_shape = (step_height, step_width)
 
     (n_frames,n_channels,im_height,im_width) = D.shape
-    model = IstaNet(D.shape,n_layers)
+    model = IstaNet(data_shape,n_layers)
     model.load_state_dict(torch.load(net_path))
     model.to(device)
     model.eval()
 
-    output = model(D,L_test,S_test)
+    output = infer_full_image(D, model, data_shape, step_shape, device)
     output, D = output.detach().cpu().numpy(), D.detach().cpu().numpy()
 
     plot_func(output,D)
