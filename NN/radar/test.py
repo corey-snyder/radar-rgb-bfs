@@ -8,6 +8,8 @@ import yaml
 from train import infer_full_image
 import os
 from skimage.io import imread
+import sys
+sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results
 
 
@@ -115,6 +117,11 @@ if __name__ == '__main__':
     output_len = output.shape[0]
     gt_images = gt_images[:output_len]
     pred_images = [np.array(np.abs(output[ii,1])*255,dtype=np.uint8) for ii in range(output_len)]  # max abs val of float image is 1
-
+    
+    print('Computing full metrics...')
     results = compute_metrics(gt_images, pred_images, thresholds, False)
+    display_results(results)
+
+    print('\n\nComputing subsampled metrics...')
+    results = compute_metrics(gt_images, pred_images, thresholds, True)
     display_results(results)
