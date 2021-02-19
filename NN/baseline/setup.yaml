@@ -11,11 +11,11 @@ downsample:
 try_gpu:
   - True
 lr:
-  - .002
+  - .01
 schedule_step:
-  - 3000
+  - 30000
 schedule_multiplier:
-  - .5
+  - .1
 patch_height:
   - 80
 patch_width:

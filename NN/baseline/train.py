@@ -193,7 +193,7 @@ if __name__ == '__main__':
     # tensorboard graph
     writer.add_graph(model,(D_train_full[:,:,:patch_height,:patch_width].to(device),D_train_full[:,:,:patch_height,:patch_width].to(device),
                             D_train_full[:,:,:patch_height,:patch_width].to(device)))
-    writer.close()
+    # writer.close()
 
     # train
 
@@ -234,10 +234,11 @@ if __name__ == '__main__':
         train_loss += loss.item()
 
         # add training loss in tensorboard from patch
-        writer.add_scalar('Training Pixel loss Patch',
-                          loss.item(),
-                          epoch)
-        writer.close()
+        # if epoch % 10 == 0:
+        #     writer.add_scalar('Training Pixel loss Patch',
+        #                   loss.item(),
+        #                   epoch)
+        #     writer.close()
 
         # add values of singular values of L in tensorboard
         # (n_frames, n_channels, im_height, im_width) = D_train_patch.shape
@@ -269,12 +270,12 @@ if __name__ == '__main__':
             writer.add_scalar('Training Pixel loss Full',
                               loss.item(),
                               epoch)
-            writer.close()
-
-            writer.add_figure('predictions vs. actuals TRAIN',
+            # writer.close()
+            if (epoch % 1000 ==0) and (epoch <10000):
+                writer.add_figure('predictions vs. actuals TRAIN',
                           plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
                           global_step=epoch)
-            writer.close()
+                # writer.close()
             del output_train_full, loss
 
             ######################
@@ -287,13 +288,13 @@ if __name__ == '__main__':
             writer.add_scalar('Testing Pixel loss Full',
                               loss.item(),
                               epoch)
-            writer.close()
-
-            writer.add_figure('predictions vs. actuals TEST',
+            # writer.close()
+            if (epoch % 1000 ==0) and (epoch <10000):
+                writer.add_figure('predictions vs. actuals TEST',
                               plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
                                                  S_test_full_target.cpu().numpy()),
                               global_step=epoch)
-            writer.close()
+                # writer.close()
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
                 epoch, train_loss, valid_loss))
