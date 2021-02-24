@@ -31,7 +31,7 @@ def plot_func(output,D):
         if ii == 0: plt.title('L')
 
         plt.subplot(N, 3, 3 * ii + 3)
-        plt.imshow(np.abs(output[n*ii, 1]),cmap='gray')
+        plt.imshow(np.abs(output[n*ii, 1]),cmap='gray',vmin=0,vmax=1)
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('abs(S)')
