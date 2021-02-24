@@ -20,3 +20,5 @@ patch_height:
   - 80
 patch_width:
   - 80
+mask:
+  - False

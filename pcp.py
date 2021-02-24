@@ -20,10 +20,11 @@ import fbpca
 import logging
 import numpy as np
 from scipy.sparse.linalg import svds
+import matplotlib.pyplot as plt
 
 
 def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
-        svd_method="approximate", **svd_args):
+        svd_method="approximate", plot_num=None, im_shape=None, **svd_args):
     # Check the SVD method.
     allowed_methods = ["approximate", "exact", "sparse"]
     if svd_method not in allowed_methods:
@@ -89,6 +90,17 @@ def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
             print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
                    "time={4:.3e}")
                   .format(i, err, np.sum(s > 0), np.sum(S > 0), svd_time))
+            if (plot_num is not None) and (i % plot_num ==0):
+                if im_shape is None:
+                    print('Need im shape')
+                    continue
+                plt.figure()
+                plt.subplot(211)
+                plt.imshow(L[:,0].reshape(im_shape),cmap='gray')
+                plt.subplot(212)
+                plt.imshow(np.abs(S[:,0]).reshape(im_shape),vmin=0,vmax=255,cmap='gray')
+                plt.show()
+
         if err < delta:
             break
         i += 1
@@ -99,7 +111,7 @@ def pcp(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
 
 
 def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
-        svd_method="approximate", **svd_args):
+        svd_method="approximate", plot_num=None, im_shape=None, **svd_args):
     # Check the SVD method.
     allowed_methods = ["approximate", "exact", "sparse"]
     if svd_method not in allowed_methods:
@@ -165,6 +177,16 @@ def radar_pcp(M, M_F, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_d
             print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
                    "time={4:.3e}")
                   .format(i, err, np.sum(s > 0), np.sum(S > 0), svd_time))
+            if (plot_num is not None) and (i % plot_num == 0):
+                if im_shape is None:
+                    print('Need im shape')
+                    continue
+                plt.figure()
+                plt.subplot(211)
+                plt.imshow(L[:, 0].reshape(im_shape), cmap='gray')
+                plt.subplot(212)
+                plt.imshow(np.abs(S[:, 0]).reshape(im_shape), vmin=0, vmax=255, cmap='gray')
+                plt.show()
         if err < delta:
             break
         i += 1

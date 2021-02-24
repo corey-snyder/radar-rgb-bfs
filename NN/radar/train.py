@@ -14,13 +14,22 @@ import shutil
 import matplotlib.pyplot as plt
 
 
-def load_data(path, radar_data, n_frames = 30, rescale_factor = 1.):
+def load_data(path, radar_data, n_frames = 30, rescale_factor = 1., mask_bool=False):
 
     D = np.load(path + '/D.npy')
     L = np.load(path + '/L_pcp.npy')
-    S = np.load(path + '/S_pcp.npy')
-    R = np.load(radar_data)
+    if mask_bool:
+        try:
+            S = np.load(path + '/S_mask_pcp.npy')
+            print('Using ' + path + '/S_mask_pcp.npy')
+        except:
+            S = np.load(path + '/S_pcp.npy')
+            print('Using ' + path + '/S_pcp.npy')
+    else:
+        S = np.load(path + '/S_pcp.npy')
+        print('Using ' + path + '/S_pcp.npy')
 
+    R = np.load(radar_data)
 
     # Add channel dimension, new shape = [n_frames,1,720,1280] not including downsampling
     D = D[:n_frames, None,:,:]
@@ -161,6 +170,7 @@ if __name__ == '__main__':
     schedule_multiplier = setup_dict['schedule_multiplier'][0]  # <1
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
+    mask_bool = setup_dict['mask'][0]
 
     # check if CUDA is available
     if try_gpu:
@@ -175,13 +185,13 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D_train_full,L_train_full_target,S_train_full_target, R_train_full = load_data(train_path,
-                                                                                   radar_data=radar_data_train_full, rescale_factor=downsample_rate)
+    D_train_full,L_train_full_target,S_train_full_target, R_train_full = load_data(train_path, radar_data=radar_data_train_full,
+                                                                                   rescale_factor=downsample_rate, mask_bool=mask_bool)
     target_train_full = torch.cat((L_train_full_target, S_train_full_target),1)  # concatenate the L and S in the channel dimension
     D_train_full.to(device)
 
-    D_test_full, L_test_full_target, S_test_full_target, R_test_full = load_data(test_path,
-                                                                                 radar_data=radar_data_test_full, rescale_factor=downsample_rate)
+    D_test_full, L_test_full_target, S_test_full_target, R_test_full = load_data(test_path, radar_data=radar_data_test_full,
+                                                                                 rescale_factor=downsample_rate, mask_bool=mask_bool)
     target_test_full = torch.cat((L_test_full_target, S_test_full_target), 1)  # concatenate the L and S in the channel dimension
     D_test_full.to(device)
 
