@@ -146,5 +146,5 @@ if __name__ == '__main__':
     L, S, (u, s, v), errors, ranks, nnzs = radar_pcp(D, M_F, maxiter=n_iterations, verbose=True)
     L = L.T.reshape(n_frames,im_height,im_width)
     S = S.T.reshape(n_frames,im_height,im_width)
-    np.save(output_dir + '/S_radar_pcp.npy',S)
-    np.save(output_dir + '/L_radar_pcp.npy',L)
+    np.save(output_dir + '/S_radar_' + str(max_shrink) + '_' + str(min_shrink)+'_pcp.npy',S)
+    np.save(output_dir + '/L_radar_' + str(max_shrink) + '_' + str(min_shrink)+'_pcp.npy',L)
