@@ -1,5 +1,5 @@
 run_path:
-  - ../runs/RADAR_l2_lr_0.001_ds_0.25__26-02-2021_11-42-11
+  - ../runs/RADAR_l2_lr_0.001_ds_0.25__28-02-2021_18-06-19
 test_path:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 #  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
@@ -7,7 +7,7 @@ test_radar_input:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
 #  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy
 try_gpu:
-  - True
+  - False
 GT:
   - ../../RGB_images/groundtruth
 step_height:
