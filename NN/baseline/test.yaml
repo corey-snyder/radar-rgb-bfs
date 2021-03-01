@@ -1,5 +1,5 @@
 run_path:
-  - ../runs/OG_l10_lr_0.001_ds_0.25__19-02-2021_12-12-42
+  - ../runs/OG_l1_lr_0.001_ds_0.25__25-02-2021_15-12-15
 test_path:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 #  - ../../output/csl_lobby_700

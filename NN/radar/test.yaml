@@ -1,5 +1,5 @@
 run_path:
-  - ../runs/RADAR_l4_lr_0.001_ds_0.25__22-02-2021_15-49-00
+  - ../runs/RADAR_l2_lr_0.001_ds_0.25__26-02-2021_11-42-11
 test_path:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 #  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700

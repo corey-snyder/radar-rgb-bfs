@@ -14,20 +14,22 @@ import shutil
 import matplotlib.pyplot as plt
 
 
-def load_data(path, radar_data, n_frames = 30, rescale_factor = 1., mask_bool=False):
+def load_data(path, radar_data, n_frames = 30, rescale_factor = 1., S=None, L=None, mask_bool=False):
 
     D = np.load(path + '/D.npy')
-    L = np.load(path + '/L_pcp.npy')
-    if mask_bool:
-        try:
-            S = np.load(path + '/S_mask_pcp.npy')
-            print('Using ' + path + '/S_mask_pcp.npy')
-        except:
-            S = np.load(path + '/S_pcp.npy')
-            print('Using ' + path + '/S_pcp.npy')
+    if L is None:
+        L = np.load(path + '/L_pcp.npy')
+        print('Using ' + path + '/L_pcp.npy')
     else:
+        print('Using ' + L)
+        L = np.load(L)
+
+    if S is None:
         S = np.load(path + '/S_pcp.npy')
         print('Using ' + path + '/S_pcp.npy')
+    else:
+        print('Using ' + S)
+        S = np.load(S)
 
     R = np.load(radar_data)
 
@@ -148,8 +150,6 @@ def infer_full_image(full_rgb_input, full_radar_input, network, patch_shape, ste
 
 
 if __name__ == '__main__':
-    torch.manual_seed(17761948)
-    np.random.seed(17761948)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
@@ -171,6 +171,14 @@ if __name__ == '__main__':
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
     mask_bool = setup_dict['mask'][0]
+    seed = setup_dict['seed'][0]
+    S_train_path = setup_dict['S_train'][0] 
+    L_train_path = setup_dict['L_train'][0]
+    S_test_path = setup_dict['S_test'][0]
+    L_test_path = setup_dict['L_test'][0]
+
+    torch.manual_seed(seed)
+    np.random.seed(seed)
 
     # check if CUDA is available
     if try_gpu:
@@ -186,12 +194,12 @@ if __name__ == '__main__':
 
     # load Data (not dataset object since no train/test split)
     D_train_full,L_train_full_target,S_train_full_target, R_train_full = load_data(train_path, radar_data=radar_data_train_full,
-                                                                                   rescale_factor=downsample_rate, mask_bool=mask_bool)
+                                                                                   rescale_factor=downsample_rate, S=S_train_path, L=L_train_path, mask_bool=mask_bool)
     target_train_full = torch.cat((L_train_full_target, S_train_full_target),1)  # concatenate the L and S in the channel dimension
     D_train_full.to(device)
 
     D_test_full, L_test_full_target, S_test_full_target, R_test_full = load_data(test_path, radar_data=radar_data_test_full,
-                                                                                 rescale_factor=downsample_rate, mask_bool=mask_bool)
+                                                                                 rescale_factor=downsample_rate, S=S_test_path, L=L_test_path, mask_bool=mask_bool)
     target_test_full = torch.cat((L_test_full_target, S_test_full_target), 1)  # concatenate the L and S in the channel dimension
     D_test_full.to(device)
 
