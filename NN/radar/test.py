@@ -12,6 +12,29 @@ import sys
 sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results
 
+def plot_func_no_radar(output,D,R):
+    n = 3
+    N = len(D)//n
+    plt.figure(figsize=(5,35))
+    for ii in range(N):
+        plt.subplot(N,3,3*ii+1)
+        plt.imshow(D[n*ii,0],cmap='gray')
+        plt.xticks([])
+        plt.yticks([])
+        if ii == 0: plt.title('Original')
+
+        plt.subplot(N, 3, 3 * ii + 2)
+        plt.imshow(output[n*ii, 0],cmap='gray')
+        plt.xticks([])
+        plt.yticks([])
+        if ii == 0: plt.title('L')
+
+        plt.subplot(N, 3, 3 * ii + 3)
+        plt.imshow(np.abs(output[n*ii, 1]),cmap='gray',vmin=0,vmax=1)
+        plt.xticks([])
+        plt.yticks([])
+        if ii == 0: plt.title('abs(S)')
+    plt.tight_layout()
 
 def plot_func(output,D,R):
     n = 3
@@ -102,7 +125,7 @@ if __name__ == '__main__':
 
     output = infer_full_image(D, R, model, data_shape, step_shape, device)
     output, D, R = output.detach().cpu().numpy(), D.detach().cpu().numpy(), R.detach().cpu().numpy()
-    plot_func(output,D,R)
+    plot_func_no_radar(output,D,R)
     plt.show()
 
     # Compute F-scores
