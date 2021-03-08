@@ -291,10 +291,10 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            if (epoch % 1000 ==0) and (epoch <10000):
-                writer.add_figure('predictions vs. actuals TRAIN',
-                          plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
-                          global_step=epoch)
+            #if (epoch % 1000 ==0) and (epoch <10000):
+            #    writer.add_figure('predictions vs. actuals TRAIN',
+            #              plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
+            #              global_step=epoch)
                 # writer.close()
             del output_train_full, loss
 
@@ -309,11 +309,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            if (epoch % 1000 ==0) and (epoch <10000):
-                writer.add_figure('predictions vs. actuals TEST',
-                              plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-                                                 S_test_full_target.cpu().numpy()),
-                              global_step=epoch)
+            #if (epoch % 1000 ==0) and (epoch <10000):
+            #    writer.add_figure('predictions vs. actuals TEST',
+            #                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+            #                                     S_test_full_target.cpu().numpy()),
+            #                  global_step=epoch)
                 # writer.close()
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
