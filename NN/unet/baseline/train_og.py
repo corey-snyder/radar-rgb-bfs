@@ -4,13 +4,12 @@ import torch.nn as nn
 import torch.optim as optim
 from unet_model import UNet
 from torch.utils.tensorboard import SummaryWriter
-
+from tensorboard_helper import plot_classes_preds
 from skimage.transform import rescale
 import argparse
 import yaml
 from datetime import datetime
 import shutil
-from sys import getsizeof
 
 import matplotlib.pyplot as plt
 
@@ -92,21 +91,19 @@ def infer_full_image(full_input, network, patch_shape, step_shape, device):
     padded_input = pad_mat(full_input,(patch_height,patch_width),(height_step, width_step))
 
     patches = padded_input.unfold(2, size=int(patch_height), step=int(height_step)).unfold(3, size=int(patch_width), step=int(width_step))
-    patches_out = torch.zeros((batch_size, 2, patches.shape[2], patches.shape[3], patch_height, patch_width)).to(device)
+    patches_out = torch.zeros((batch_size, 1, patches.shape[2], patches.shape[3], patch_height, patch_width)).to(device)
     for ii in range(patches.shape[2]):
         for jj in range(patches.shape[3]):
             patch_input = patches[:,:,ii,jj].to(device)
-            L_patch_input = torch.zeros_like(patch_input).to(device)
-            S_patch_input = torch.zeros_like(patch_input).to(device)
-            patches_out[:,:,ii,jj] = network(patch_input, L_patch_input, S_patch_input)
+            patches_out[:,:,ii,jj] = network(patch_input).detach()
 
     # fold data
     # reshape output to match F.fold input
-    patches_out = patches_out.contiguous().view(batch_size, 2, -1, patch_height*patch_width)
+    patches_out = patches_out.contiguous().view(batch_size, 1, -1, patch_height*patch_width)
     # print(patches_out.shape)  # [B, C, nb_patches_all, kernel_size*kernel_size]
     patches_out = patches_out.permute(0, 1, 3, 2)
     # print(patches_out.shape)  # [B, C, kernel_size*kernel_size, nb_patches_all]
-    patches_out = patches_out.contiguous().view(batch_size, 2 * patch_height * patch_width, -1)
+    patches_out = patches_out.contiguous().view(batch_size, patch_height * patch_width, -1)
     # print(patches_out.shape)  # [B, C*prod(kernel_size), L] as expected by Fold
     # https://pytorch.org/docs/stable/nn.html#torch.nn.Fold
 
@@ -118,9 +115,8 @@ def infer_full_image(full_input, network, patch_shape, step_shape, device):
     ones_tensor = torch.ones_like(patches_out).to(device)
     
     # memory saver
-    del L_patch_input, S_patch_input, patches_out
+    del patches_out
     torch.cuda.empty_cache()
-
 
     ones_tensor = fold(ones_tensor)
 
@@ -168,11 +164,10 @@ if __name__ == '__main__':
 
     # load Data (not dataset object since no train/test split)
     D_train_full, S_train_full = load_data(train_path, threshold=threshold, rescale_factor=downsample_rate)
+    S_train_full = S_train_full.to(device)
     data_shape = list(np.concatenate([D_train_full.shape[:2],[patch_height,patch_width]]))
-    #print(D_train_full.element_size()*D_train_full.nelement())
-    #print(getsizeof(S_train_full))
-    print("allocated ",torch.cuda.memory_allocated(0))
     D_test_full, S_test_full = load_data(test_path, threshold = threshold, rescale_factor=downsample_rate)
+    S_test_full = S_test_full.to(device)
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
@@ -211,7 +206,6 @@ if __name__ == '__main__':
         ###################
         model.train()
         model.to(device)
-        print("allocated ",torch.cuda.memory_allocated(0))
         # clear the gradients of all optimized variables
         optimizer.zero_grad()
 
@@ -252,22 +246,14 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 10 == 0:
+        if epoch % 100 == 0:
             # memory saver
 
             del S_train_patch, D_train_patch, output, loss
             torch.cuda.empty_cache()
             step_shape = np.array(data_shape[-2:])//2
             model.eval()
-            #print(D_train_full.shape)
-            #print(getsizeof(D_train_full))
-            #output_train_full = model.to('cpu')(D_train_full)
-            #D_train_full = D_train_full.to(device)
-            #print("allocated ",torch.cuda.memory_allocated(0))
-            #output_train_full = model(D_train_full)
             output_train_full = infer_full_image(D_train_full,model,data_shape,step_shape, device)
-            plt.imshow(output_train_full[15, 0].detach().cpu().numpy())
-            plt.show()
             # compute pixel loss of entire image
             loss = criterion(output_train_full, S_train_full)
             train_loss = loss.item()
@@ -275,33 +261,26 @@ if __name__ == '__main__':
                              loss.item(),
                              epoch)
 
-            # if (epoch % 1000 ==0) and (epoch <10000):
-               # writer.add_figure('predictions vs. actuals TRAIN',
-               #           plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full.cpu().numpy(),S_train_full.cpu().numpy()),
-               #           global_step=epoch)
+            if (epoch % 100 ==0) and (epoch <10000):
+               writer.add_figure('predictions vs. actuals TRAIN',
+                         plot_classes_preds(output_train_full.cpu().detach().numpy(),D_train_full.cpu().numpy(), S_train_full.cpu().numpy()),
+                         global_step=epoch)
 
             del output_train_full, loss
 
             ######################
             # validate the model #
             ######################
-		
-            #output_test_full = model.to('cpu')(D_test_full)
-            output_test_full = model(D_test_full.to(device))
-            plt.imshow(output_test_full[5,0].detach().cpu().numpy())
-            plt.show()
+            output_test_full = infer_full_image(D_test_full,model,data_shape,step_shape, device)
             loss = criterion(output_test_full, S_test_full)
             valid_loss = loss.item()
             writer.add_scalar('Testing Pixel loss Full',
                               loss.item(),
                               epoch)
-            # writer.close()
-            # if (epoch % 1000 ==0) and (epoch <10000):
-            #    writer.add_figure('predictions vs. actuals TEST',
-            #                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-            #                                     S_test_full_target.cpu().numpy()),
-            #                  global_step=epoch)
-            # writer.close()
+            if (epoch % 100 ==0) and (epoch <10000):
+               writer.add_figure('predictions vs. actuals TEST',
+                             plot_classes_preds(output_test_full.cpu().detach().numpy(),D_test_full.cpu().numpy(), S_test_full.cpu().numpy()),
+                             global_step=epoch)
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
                 epoch, train_loss, valid_loss))
