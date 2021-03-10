@@ -28,7 +28,7 @@ if __name__ == '__main__':
     if downsample_rate !=1:
         gt_images = [gt_images[ii][::int(1/downsample_rate),::int(1/downsample_rate)] for ii in range(len(gt_images))]
         S = S[:,::int(1/downsample_rate),::int(1/downsample_rate)]
-    output_len = S.shape[0]
+    output_len = 30 #S.shape[0]
     gt_images = gt_images[:output_len]
     pred_images = [np.array(np.abs(S[ii])*255,dtype=np.uint8) for ii in range(output_len)]  # max abs val of float image is 1
     
