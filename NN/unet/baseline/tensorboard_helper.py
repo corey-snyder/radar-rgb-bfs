@@ -15,7 +15,7 @@ def plot_classes_preds(output,D, S):
     S_pred = output[:,0]
 
     # plot the images in the batch, along with predicted and true labels
-    fig = plt.figure(figsize=(6, 23))
+    fig = plt.figure(figsize=(6, 14))
     # plt.suptitle("Original Results")
     for idx,frame in enumerate(np.arange(0,30,3)):
         ax = fig.add_subplot(10, 3, idx*3 + 1, xticks=[], yticks=[])

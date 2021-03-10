@@ -1,0 +1,14 @@
+run_path:
+  - ../runs/UNET_OG_thresh_0.15_lr_0.001_ds_0.25__10-03-2021_13-50-43
+test_path:
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+#  - ../../output/csl_lobby_700
+try_gpu:
+  - True
+GT:
+  - ../../../RGB_images/groundtruth
+step_height:
+  - 30
+step_width:
+  - 30

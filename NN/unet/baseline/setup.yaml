@@ -1,15 +1,15 @@
 test_path:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
-  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+#  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
 train_path:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
-  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
+#  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
 downsample:
   - .25
 try_gpu:
   - True
 lr:
-  - .001
+  - .0001
 schedule_step:
   - 30000
 schedule_multiplier:

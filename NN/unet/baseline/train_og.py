@@ -246,7 +246,7 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 100 == 0:
+        if epoch % 250 == 0:
             # memory saver
 
             del S_train_patch, D_train_patch, output, loss
@@ -261,7 +261,7 @@ if __name__ == '__main__':
                              loss.item(),
                              epoch)
 
-            if (epoch % 100 ==0) and (epoch <10000):
+            if (epoch % 1000 ==0) and (epoch <10000):
                writer.add_figure('predictions vs. actuals TRAIN',
                          plot_classes_preds(output_train_full.cpu().detach().numpy(),D_train_full.cpu().numpy(), S_train_full.cpu().numpy()),
                          global_step=epoch)
@@ -277,7 +277,7 @@ if __name__ == '__main__':
             writer.add_scalar('Testing Pixel loss Full',
                               loss.item(),
                               epoch)
-            if (epoch % 100 ==0) and (epoch <10000):
+            if (epoch % 1000 ==0) and (epoch <10000):
                writer.add_figure('predictions vs. actuals TEST',
                              plot_classes_preds(output_test_full.cpu().detach().numpy(),D_test_full.cpu().numpy(), S_test_full.cpu().numpy()),
                              global_step=epoch)
