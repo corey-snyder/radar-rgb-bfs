@@ -179,7 +179,8 @@ if __name__ == '__main__':
             torch.cuda.empty_cache()
             model.eval()
 
-            output_train_full = model.to('cpu')(D_train_full)
+            # output_train_full = model.to('cpu')(D_train_full)
+            output_train_full = model(D_train_full)
             plt.imshow(output_train_full[15, 0].detach().cpu().numpy())
             plt.show()
             # compute pixel loss of entire image
@@ -200,7 +201,8 @@ if __name__ == '__main__':
             # validate the model #
             ######################
 
-            output_test_full = model.to('cpu')(D_test_full)
+            # output_test_full = model.to('cpu')(D_test_full)
+            output_test_full = model(D_test_full)
             plt.imshow(output_test_full[5,0].detach().cpu().numpy())
             plt.show()
             loss = criterion(output_test_full, S_test_full)
