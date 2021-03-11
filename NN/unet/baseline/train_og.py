@@ -32,6 +32,10 @@ def load_data(path, threshold, n_frames=30, rescale_factor=1., ):
     S[S < threshold] = 0
     S[S >= threshold] = 1
     print('Thresholding the Sparse Component at ', threshold)
+
+    # switch the number of frames to be the number of channels
+    D = np.transpose(D,(1,0,2,3))
+    S = np.transpose(S,(1,0,2,3))
     return torch.from_numpy(D).float(), torch.from_numpy(S).float()
 
 
@@ -91,7 +95,7 @@ def infer_full_image(full_input, network, patch_shape, step_shape, device):
     padded_input = pad_mat(full_input,(patch_height,patch_width),(height_step, width_step))
 
     patches = padded_input.unfold(2, size=int(patch_height), step=int(height_step)).unfold(3, size=int(patch_width), step=int(width_step))
-    patches_out = torch.zeros((batch_size, 1, patches.shape[2], patches.shape[3], patch_height, patch_width)).to(device)
+    patches_out = torch.zeros((batch_size, channels, patches.shape[2], patches.shape[3], patch_height, patch_width)).to(device)
     for ii in range(patches.shape[2]):
         for jj in range(patches.shape[3]):
             patch_input = patches[:,:,ii,jj].to(device)
@@ -99,11 +103,11 @@ def infer_full_image(full_input, network, patch_shape, step_shape, device):
 
     # fold data
     # reshape output to match F.fold input
-    patches_out = patches_out.contiguous().view(batch_size, 1, -1, patch_height*patch_width)
+    patches_out = patches_out.contiguous().view(batch_size, channels, -1, patch_height*patch_width)
     # print(patches_out.shape)  # [B, C, nb_patches_all, kernel_size*kernel_size]
     patches_out = patches_out.permute(0, 1, 3, 2)
     # print(patches_out.shape)  # [B, C, kernel_size*kernel_size, nb_patches_all]
-    patches_out = patches_out.contiguous().view(batch_size, patch_height * patch_width, -1)
+    patches_out = patches_out.contiguous().view(batch_size, channels * patch_height * patch_width, -1)
     # print(patches_out.shape)  # [B, C*prod(kernel_size), L] as expected by Fold
     # https://pytorch.org/docs/stable/nn.html#torch.nn.Fold
 
@@ -177,7 +181,7 @@ if __name__ == '__main__':
     shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
 
     # init model
-    model = UNet(n_channels=1, n_classes=1)
+    model = UNet(n_channels=30, n_classes=30)
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.BCELoss()
@@ -246,7 +250,7 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 250 == 0:
+        if epoch % 2 == 0:
             # memory saver
 
             del S_train_patch, D_train_patch, output, loss

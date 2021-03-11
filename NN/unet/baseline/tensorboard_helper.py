@@ -12,17 +12,19 @@ def plot_classes_preds(output,D, S):
     information based on whether the prediction was correct or not.
     Uses the "images_to_probs" function.
     '''
-    S_pred = output[:,0]
+    S_pred = output[0]
+    D = D[0]
+    S = S[0]
 
     # plot the images in the batch, along with predicted and true labels
     fig = plt.figure(figsize=(6, 14))
     # plt.suptitle("Original Results")
     for idx,frame in enumerate(np.arange(0,30,3)):
         ax = fig.add_subplot(10, 3, idx*3 + 1, xticks=[], yticks=[])
-        plt.imshow(D[frame, 0],cmap='gray')
+        plt.imshow(D[frame],cmap='gray')
         if idx==0: plt.title('Input')
         ax = fig.add_subplot(10, 3, idx*3 + 2, xticks=[], yticks=[])
-        plt.imshow(S[frame,0],cmap='gray', vmin=0, vmax=1)
+        plt.imshow(S[frame],cmap='gray', vmin=0, vmax=1)
         if idx==0: plt.title('S Target')
         ax = fig.add_subplot(10, 3, idx*3 + 3, xticks=[], yticks=[])
         plt.imshow(S_pred[frame],cmap='gray', vmin=0, vmax=1)
