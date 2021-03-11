@@ -13,22 +13,29 @@ sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results
 
 
-def plot_func(output,D):
+def plot_func(output,D, target):
     n = 3
     N = len(D)//n
     plt.figure(figsize=(5,35))
     for ii in range(N):
-        plt.subplot(N,2,2*ii+1)
+        plt.subplot(N,3,3*ii+1)
         plt.imshow(D[n*ii,0],cmap='gray')
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('Original')
 
-        plt.subplot(N, 2, 2 * ii + 2)
+        plt.subplot(N, 3, 3 * ii + 2)
+        plt.imshow(np.abs(target[n*ii, 0]),cmap='gray',vmin=0,vmax=1)
+        plt.xticks([])
+        plt.yticks([])
+        if ii == 0: plt.title('Target')
+
+        plt.subplot(N, 3, 3 * ii + 3)
         plt.imshow(np.abs(output[n*ii, 0]),cmap='gray',vmin=0,vmax=1)
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('abs(S)')
+
     plt.tight_layout()
 
 
@@ -41,6 +48,7 @@ if __name__ == '__main__':
     with open(yampl_test_path) as file:
         setup_dict = yaml.load(file, Loader=yaml.FullLoader)
     run_path = setup_dict['run_path'][0]
+    net_name = setup_dict['net_name'][0]
     test_path = setup_dict['test_path'][0]
     try_gpu = setup_dict['try_gpu'][0]
     step_height = setup_dict['step_height'][0]
@@ -50,8 +58,9 @@ if __name__ == '__main__':
         print('Testing F-score')
         fscore_flag = True
         gt_path = setup_dict['GT'][0]
+    else: fscore_flag=False
 
-    net_path = run_path + '/model_bfs.pt'
+    net_path = run_path + '/' + net_name
     yaml_train_path = run_path + '/setup.yaml'
 
     with open(yaml_train_path) as file:
@@ -87,9 +96,11 @@ if __name__ == '__main__':
     output = infer_full_image(D, model, data_shape, step_shape, device)
     output, D = output.detach().cpu().numpy(), D.detach().cpu().numpy()
 
-    plot_func(output,D)
+    plot_func(output,D, S_target)
     plt.show()
 
+
+    if fscore_flag == False: sys.exit()
     # Compute F-scores
 
     thresholds = [i * 0.05 for i in range(20)]

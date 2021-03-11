@@ -194,7 +194,7 @@ if __name__ == '__main__':
 
     n_epochs = 50000  # number of epochs to train the model
     valid_loss_min = np.Inf  # track change in validation loss
-
+    train_loss_min = np.Inf
     for epoch in range(1, n_epochs + 1):
 
         # keep track of training and validation loss
@@ -260,6 +260,13 @@ if __name__ == '__main__':
             writer.add_scalar('Training Pixel loss Full',
                              loss.item(),
                              epoch)
+            # save other model if training loss has decreased
+            if (train_loss <= train_loss_min) and (train_loss != 0):
+                print('Train loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
+                    train_loss_min,
+                    train_loss))
+                torch.save(model.state_dict(), log_dir + '/model_bfs_lowest_train.pt')
+                train_loss_min = train_loss
 
             if (epoch % 1000 ==0) and (epoch <10000):
                writer.add_figure('predictions vs. actuals TRAIN',

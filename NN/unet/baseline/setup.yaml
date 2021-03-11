@@ -19,6 +19,6 @@ patch_height:
 patch_width:
   - 80
 threshold:
-  - .15
+  - .05
 seed:
   - 5
