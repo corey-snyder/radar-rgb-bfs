@@ -15,23 +15,23 @@ from evaluate import compute_metrics, display_results
 
 def plot_func(output,D, target):
     n = 3
-    N = len(D)//n
+    N = D.shape[1]//n
     plt.figure(figsize=(5,35))
     for ii in range(N):
         plt.subplot(N,3,3*ii+1)
-        plt.imshow(D[n*ii,0],cmap='gray')
+        plt.imshow(D[0, n*ii],cmap='gray')
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('Original')
 
         plt.subplot(N, 3, 3 * ii + 2)
-        plt.imshow(np.abs(target[n*ii, 0]),cmap='gray',vmin=0,vmax=1)
+        plt.imshow(np.abs(target[0, n*ii]),cmap='gray',vmin=0,vmax=1)
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('Target')
 
         plt.subplot(N, 3, 3 * ii + 3)
-        plt.imshow(np.abs(output[n*ii, 0]),cmap='gray',vmin=0,vmax=1)
+        plt.imshow(np.abs(output[0, n*ii]),cmap='gray',vmin=0,vmax=1)
         plt.xticks([])
         plt.yticks([])
         if ii == 0: plt.title('abs(S)')
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     step_shape = (step_height, step_width)
 
     (n_frames,n_channels,im_height,im_width) = D.shape
-    model = UNet(n_channels=1, n_classes=1)
+    model = UNet(n_channels=30, n_classes=30)
     model.load_state_dict(torch.load(net_path))
     model.to(device)
     model.eval()

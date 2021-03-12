@@ -250,7 +250,7 @@ if __name__ == '__main__':
         # writer.close()
 
         # show sample predictions
-        if epoch % 2 == 0:
+        if epoch % 250 == 0:
             # memory saver
 
             del S_train_patch, D_train_patch, output, loss
