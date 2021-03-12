@@ -11,10 +11,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-S", help="path of Sparse numpy file", type=str)
     parser.add_argument("-ds",help="downsample rate per dimension", type=float)
+    parser.add_argument("-GT", help="path of dir of GT", type=str)
     args = parser.parse_args()
     s_path = args.S
     downsample_rate = args.ds
-    gt_path = "RGB_images/groundtruth/" 
+    gt_path = args.GT
 
     # Load Data
     S = np.load(s_path)   
