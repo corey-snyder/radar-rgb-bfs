@@ -1,17 +1,20 @@
 run_path:
-  - ../l8_stats/RADAR_l8_lr_0.001_ds_0.25__04-03-2021_15-47-57
+  - ../l8_stats/RADAR_l8_lr_0.001_ds_0.25__04-03-2021_21-57-50
 test_path:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
 #  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
 test_radar_input:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby/radar_frames_eceb_lobby_likelihood.npy
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
+- /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0/radar_frames_csl_side_0_likelihood.npy
 #  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy
 try_gpu:
-  - False
+  - True
 GT:
-  - ../../RGB_images/groundtruth
+#  - ../../RGB_images/groundtruth
+  - ../../RGB_images_csl_lobby_side_0/groundtruth
 step_height:
   - 30
 step_width:

@@ -1,13 +1,15 @@
 run_path:
-  - ../l8_stats/OG_l8_lr_0.001_ds_0.25__04-03-2021_21-33-01
+  - ../l8_stats/OG_l8_lr_0.001_ds_0.25__04-03-2021_23-27-15
 test_path:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
 #  - ../../output/csl_lobby_700
 try_gpu:
-  - False
+  - True
 GT:
-  - ../../RGB_images/groundtruth
+#  - ../../RGB_images/groundtruth
+  - ../../RGB_images_csl_lobby_side_0/groundtruth
 step_height:
   - 30
 step_width:
