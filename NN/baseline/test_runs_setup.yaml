@@ -1,0 +1,12 @@
+runs_dir:
+  - ../runs/OG/
+test_data:
+  - ../../output/csl_lobby_700
+GT:
+  - ../../RGB_images/groundtruth
+try_gpu:
+  - True
+step_height:
+  - 40
+step_width:
+  - 40
