@@ -74,7 +74,7 @@ if __name__ == '__main__':
         else:
             print('CUDA is available!  Testing on GPU ...')
 
-        D, L_target, S_target, R = load_data(test_data, radar_data=test_radar_data, rescale_factor=downsample_rate)
+        D, L_target, S_target, R = load_data(test_data, radar_data=test_radar_data, rescale_factor=downsample_rate,print_flag=False)
         data_shape = list(np.concatenate([D.shape[:2],[patch_height,patch_width]]))
         step_shape = (step_height, step_width)
 

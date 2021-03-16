@@ -14,21 +14,21 @@ import shutil
 import matplotlib.pyplot as plt
 
 
-def load_data(path, radar_data, n_frames = 30, rescale_factor = 1., S=None, L=None, mask_bool=False):
+def load_data(path, radar_data, n_frames = 30, rescale_factor = 1., S=None, L=None, print_flag = True):
 
     D = np.load(path + '/D.npy')
     if L is None:
         L = np.load(path + '/L_pcp.npy')
-        print('Using ' + path + '/L_pcp.npy')
+        if print_flag: print('Using ' + path + '/L_pcp.npy')
     else:
-        print('Using ' + L)
+        if print_flag: print('Using ' + L)
         L = np.load(L)
 
     if S is None:
         S = np.load(path + '/S_pcp.npy')
-        print('Using ' + path + '/S_pcp.npy')
+        if print_flag: print('Using ' + path + '/S_pcp.npy')
     else:
-        print('Using ' + S)
+        if print_flag: print('Using ' + S)
         S = np.load(S)
 
     R = np.load(radar_data)
