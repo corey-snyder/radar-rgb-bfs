@@ -170,7 +170,6 @@ if __name__ == '__main__':
     schedule_multiplier = setup_dict['schedule_multiplier'][0]  # <1
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
-    mask_bool = setup_dict['mask'][0]
     seed = setup_dict['seed'][0]
     S_train_path = setup_dict['S_train'][0] 
     L_train_path = setup_dict['L_train'][0]
@@ -194,12 +193,12 @@ if __name__ == '__main__':
 
     # load Data (not dataset object since no train/test split)
     D_train_full,L_train_full_target,S_train_full_target, R_train_full = load_data(train_path, radar_data=radar_data_train_full,
-                                                                                   rescale_factor=downsample_rate, S=S_train_path, L=L_train_path, mask_bool=mask_bool)
+                                                                                   rescale_factor=downsample_rate, S=S_train_path, L=L_train_path)
     target_train_full = torch.cat((L_train_full_target, S_train_full_target),1)  # concatenate the L and S in the channel dimension
     D_train_full.to(device)
 
     D_test_full, L_test_full_target, S_test_full_target, R_test_full = load_data(test_path, radar_data=radar_data_test_full,
-                                                                                 rescale_factor=downsample_rate, S=S_test_path, L=L_test_path, mask_bool=mask_bool)
+                                                                                 rescale_factor=downsample_rate, S=S_test_path, L=L_test_path)
     target_test_full = torch.cat((L_test_full_target, S_test_full_target), 1)  # concatenate the L and S in the channel dimension
     D_test_full.to(device)
 
@@ -314,7 +313,6 @@ if __name__ == '__main__':
             #                  plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
             #                                     S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
             #                  global_step=epoch)
-                # writer.close()
             del output_train_full, loss
 
             ######################
