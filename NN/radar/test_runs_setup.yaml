@@ -1,14 +1,14 @@
 runs_dir:
-  - ../runs/RADAR/
+  - ../l2_radar_thresh/
 test_data:
-  - ../../output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 test_radar_data:
-  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
 GT:
   - ../../RGB_images/groundtruth
 try_gpu:
   - True
 step_height:
-  - 80
+  - 30
 step_width:
-  - 80
+  - 30
