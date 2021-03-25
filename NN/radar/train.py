@@ -170,7 +170,8 @@ if __name__ == '__main__':
     schedule_multiplier = setup_dict['schedule_multiplier'][0]  # <1
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
-    seed = setup_dict['seed'][0]
+    try: seed = setup_dict['seed'][0]
+    except: seed = setup_dict['seed']
     S_train_path = setup_dict['S_train'][0] 
     L_train_path = setup_dict['L_train'][0]
     S_test_path = setup_dict['S_test'][0]
