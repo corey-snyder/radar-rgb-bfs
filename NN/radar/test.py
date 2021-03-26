@@ -144,7 +144,3 @@ if __name__ == '__main__':
     print('Computing full metrics...')
     results = compute_metrics(gt_images, pred_images, thresholds, False)
     display_results(results)
-
-    print('\n\nComputing subsampled metrics...')
-    results = compute_metrics(gt_images, pred_images, thresholds, True)
-    display_results(results)
