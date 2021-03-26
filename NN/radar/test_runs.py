@@ -6,6 +6,7 @@ from train import load_data
 import argparse
 import yaml
 from train import infer_full_image
+from test import plot_func
 import os
 from skimage.io import imread
 import sys
@@ -20,8 +21,8 @@ def display_dir_results(results_list):
         for run in results_list:
             vals.append(run[key]['f-measure'])
         print('F-score @ threshold {:.2f}:'.format(key))
-        print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.min(vals),np.max(vals),
-                                                                           np.mean(vals), np.std(vals)))
+        print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.nanmin(vals),np.nanmax(vals),
+                                                                           np.nanmean(vals), np.nanstd(vals)))
 
 
 if __name__ == '__main__':
@@ -96,7 +97,10 @@ if __name__ == '__main__':
 
         print('Computing full metrics...')
         temp_results = compute_metrics(gt_images_temp, pred_images, thresholds, False)
-        # display_results(temp_results)
+        display_results(temp_results)
         results.append(temp_results)
+        #R = R.detach().cpu().numpy()
+        #plot_func(output,D,R)
+        #plt.show()
     print('\n')
     display_dir_results(results)

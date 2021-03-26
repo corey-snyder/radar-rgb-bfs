@@ -1,15 +1,15 @@
-train_path:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
-  - ../../output/csl_lobby_700
-train_radar_input:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
-  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy
 test_path:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
-  - ../../output/csl_lobby_side_0
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+#  - ../../output/csl_lobby_700
 test_radar_input:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0/radar_frames_csl_side_0_likelihood.npy
-  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_side_0_likelihood.npy
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
+#  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy
+train_path:
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
+#  - ../../output/csl_lobby_side_0
+train_radar_input:
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0/radar_frames_csl_side_0_likelihood.npy
+#  - /home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_side_0_likelihood.npy
 n_layers:
   - 2
 downsample:

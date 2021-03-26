@@ -1,5 +1,5 @@
 run_path:
-  - ../l8_stats/RADAR_l8_lr_0.001_ds_0.25__04-03-2021_21-57-50
+  - ../runs/RADAR_l2_lr_0.001_ds_0.25__22-03-2021_16-34-57
 test_path:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
