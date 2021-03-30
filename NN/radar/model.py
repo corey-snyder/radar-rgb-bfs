@@ -35,9 +35,7 @@ class IstaLayer(nn.Module):
 
         # notice in line below, mu is multiplied by 2
         self.lambda1 = nn.Parameter(torch.tensor([2/mu]))
-
-        # self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
-        # self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
+        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
 
         self.threshold = nn.Threshold(0,0)
 
@@ -78,7 +76,7 @@ class IstaLayer(nn.Module):
         D_out = D
         L_out = L_stacked.T.reshape(-1,1,self.im_height,self.im_width)
 
-        S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-nn.functional.relu(R7_2dim))
+        S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-nn.functional.relu(R7_2dim)*self.lambda2)
 
         return D_out, L_out, S_out, R
 
