@@ -1,6 +1,8 @@
 *.png
-
+*.pt
 *checkpoint.ipynb
 *.xml
 *.pyc
 events.*
+NN/runs/*/*/*.yaml
+output/*/*.npy
