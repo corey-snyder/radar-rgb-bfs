@@ -70,7 +70,6 @@ class AdmmLayer(nn.Module):
         return (D, L_out, S_out, Y_out)
 
     # sequential processing (k+1 is dependent on other k+1 terms)
-    # TODO: If we keep this, then we can get rid of some conv layers
     def forward(self, input):
         """
         :param input:
@@ -79,15 +78,8 @@ class AdmmLayer(nn.Module):
 
         (D, L, S, Y) = input
 
-        L1 = self.p1(L)
-        L2 = self.p2(L)
-
         Y1 = self.mu1 * Y
         Y2 = self.mu2 * Y
-
-        S3 = self.p3 * S
-        S4 = self.p4 * S
-
 
         # create k+1 low rank component
         D_S4_Y2 = D - S4 - Y2
@@ -100,11 +92,14 @@ class AdmmLayer(nn.Module):
         L_out = L_stacked.T.reshape(-1, 1, self.im_height, self.im_width)
 
         # create k+1 sparse component
-        D_L1_Y1 = D - L_out + Y1
+        L1 = self.p2(L_out)
+        D_L1_Y1 = D - L1 + Y1
         S_out = self.threshold(D_L1_Y1 - self.lambda2)
 
         # create k+1 lagrangian step
-        Y_out = Y + self.mu3 * (D-L_out-S_out)
+        L2 = self.p2(L)
+        S3 = self.p3(S)
+        Y_out = Y + self.mu3 * (D-L2-S3)
 
         return D, L_out, S_out, Y_out
 
