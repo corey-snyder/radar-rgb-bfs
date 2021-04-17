@@ -79,7 +79,11 @@ if __name__ == '__main__':
     else:
         print('CUDA is available!  Testing on GPU ...')
 
-    D, L_target, S_target = load_data(test_path,rescale_factor=downsample_rate)
+    _, L_target, S_target = load_data(test_path,rescale_factor=downsample_rate)
+    _, _, S_fake_target = load_data('../../output/csl_lobby_0',rescale_factor=downsample_rate)
+
+    D = L_target + S_target + S_fake_target
+
     data_shape = list(np.concatenate([D.shape[:2],[patch_height,patch_width]]))
     step_shape = (step_height, step_width)
 
@@ -95,6 +99,24 @@ if __name__ == '__main__':
     plot_func(output,D)
     plt.show()
 
+    plt.figure()
+    plt.subplot(121)
+    plt.title('S combination')
+    S_out = output[:,1]
+    S_rows = np.sum(np.abs(S_out), 1)
+    plt.imshow(S_rows.T, aspect='auto')
+    plt.subplot(122)
+    radar = np.load('/home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy')[:30,::4]
+    plt.imshow(radar.T,aspect='auto')
+    plt.show()
+
+    S_radar_intersection = np.array(radar/np.max(radar)>.1,dtype=bool) * np.array(S_rows/np.max(S_rows)>.1,dtype=bool)
+    plt.imshow(S_radar_intersection.T, aspect='auto')
+    plt.show()
+
+    S_masked = S_radar_intersection[:, np.newaxis, :] * np.abs(S_out)
+    plt.imshow(S_masked[1])
+    plt.show()
     # Compute F-scores
 
     thresholds = [i * 0.05 for i in range(20)]
