@@ -208,7 +208,10 @@ def joint_sum_ista(M,R,delta=1e-6, mu=None, maxiter=500, verbose=False, missing_
     :param svd_args:
     :return:
     """
-    # Check the SVD method.
+    lam1 = .1
+    lam2 = 2
+    lam3 = 2
+    lam4 = .1    # Check the SVD method.
     allowed_methods = ["approximate", "exact", "sparse"]
     if svd_method not in allowed_methods:
         raise ValueError("'svd_method' must be one of: {0}"
@@ -256,6 +259,7 @@ def joint_sum_ista(M,R,delta=1e-6, mu=None, maxiter=500, verbose=False, missing_
         u, s, v = _svd(svd_method, M - image_S + radar_L, rank+1, 1./mu, **svd_args)
 
         s = shrink(s, 1./mu)
+        # s = shrink(s, lam4/lam2)
         rank = np.sum(s > 0.0)
         print("Image L rank: ", rank)
         u, s, v = u[:, :rank], s[:rank], v[:rank, :]
@@ -268,6 +272,7 @@ def joint_sum_ista(M,R,delta=1e-6, mu=None, maxiter=500, verbose=False, missing_
         svd_time = time.time() - strt
 
         s = shrink(s, 1. / mu)
+        # s = shrink(s, lam4/ lam3)
         rank = np.sum(s > 0.0)
         print("Radar L rank: ", rank)
         u, s, v = u[:, :rank], s[:rank], v[:rank, :]
@@ -279,10 +284,13 @@ def joint_sum_ista(M,R,delta=1e-6, mu=None, maxiter=500, verbose=False, missing_
         # Compute image_S
         # Shrinkage step.
         image_S = shrink(M - image_L + radar_S,lam / mu) - radar_S
+        # image_S = shrink(M - image_L + radar_S,lam1 / lam2) - radar_S
 
         # Compute radar_S
         # Shrinkage step.
-        radar_S = shrink(R - radar_L + image_S, lam / mu) - image_S
+        radar_S = shrink(R - radar_L + image_S, lam/mu) - image_S
+
+        # radar_S = shrink(R - radar_L + image_S, lam1 / lam3) - image_S
 
         image_step = M - image_L - image_S
         radar_step = R - radar_L - radar_S
@@ -300,16 +308,28 @@ def joint_sum_ista(M,R,delta=1e-6, mu=None, maxiter=500, verbose=False, missing_
                     print('Need im shape')
                     continue
                 plt.figure(figsize=(10,5))
-                plt.tight_layout()
+                # plt.tight_layout()
                 plt.suptitle("Iteration: "+ str(i))
                 plt.subplot(221)
-                plt.imshow(image_L[:,0].reshape(im_shape),cmap='gray')
+                plt.yticks([])
+                plt.xticks([])
+                plt.title("RGB L")
+                plt.imshow(image_L[:,10].reshape(im_shape),cmap='gray')
                 plt.subplot(222)
-                plt.imshow(np.abs(image_S[:,0]).reshape(im_shape),vmin=0,vmax=1,cmap='gray')
+                plt.yticks([])
+                plt.xticks([])
+                plt.title("RGB S")
+                plt.imshow(np.abs(image_S[:,10]).reshape(im_shape), cmap='gray')
                 plt.subplot(223)
-                plt.imshow(radar_L[:, 0].reshape(im_shape), cmap='gray')
+                plt.yticks([])
+                plt.xticks([])
+                plt.title("Radar L")
+                plt.imshow(radar_L[:, 10].reshape(im_shape), cmap='gray')
                 plt.subplot(224)
-                plt.imshow(np.abs(radar_S[:, 0]).reshape(im_shape),vmin=0,vmax=1, cmap='gray')
+                plt.yticks([])
+                plt.xticks([])
+                plt.title("Radar S")
+                plt.imshow(np.abs(radar_S[:, 10]).reshape(im_shape), cmap='gray')
                 plt.show()
 
         # if err < delta:
@@ -695,5 +715,5 @@ if __name__ == '__main__':
     M_F = M_F.T
     M_F /= np.max(M_F)
 
-    image_L, image_S, radar_L, radar_S, (u, s, v), errors, ranks, nnzs = joint_prod_ista(D, M_F, verbose=True, maxiter=400,
-                                              plot_num=10,im_shape=[720//4,1280//4])
+    image_L, image_S, radar_L, radar_S, _, errors, ranks, nnzs = joint_sum_ista(D, M_F, verbose=True, maxiter=400,
+                                              plot_num=50,im_shape=[720//4,1280//4])
