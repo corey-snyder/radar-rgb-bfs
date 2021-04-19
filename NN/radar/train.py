@@ -168,6 +168,7 @@ if __name__ == '__main__':
     learning_rate = setup_dict['lr'][0]
     schedule_step = setup_dict['schedule_step'][0]
     schedule_multiplier = setup_dict['schedule_multiplier'][0]  # <1
+    cosine_multiplier = setup_dict['cosine_multiplier'][0]
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
     try: seed = setup_dict['seed'][0]
@@ -217,6 +218,8 @@ if __name__ == '__main__':
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
+    cosine_similarity = nn.CosineSimilarity(dim=1)
+
     # specify optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step)
@@ -256,7 +259,9 @@ if __name__ == '__main__':
         # forward pass: compute predicted outputs by passing inputs to the model
         output = model(D_train_patch, L_train_patch, S_train_patch, R_train_patch)
         # calculate the batch loss
-        loss = criterion(output, target_train_patch)
+        rgb_rows = torch.sum(torch.abs(output[:,1]),dim=1)
+        cos_los = - cosine_multiplier * torch.mean(cosine_similarity(rgb_rows,R_train_patch[:,0]))
+        loss = criterion(output, target_train_patch) + cos_los
         # backward pass: compute gradient of the loss with respect to model parameters
         loss.backward()
         # perform a single optimization step (parameter update)
@@ -309,11 +314,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            #if (epoch % 1000 ==0) and (epoch <10000):
-            #    writer.add_figure('predictions vs. actuals TRAIN',
-            #                  plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
-            #                                     S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
-            #                  global_step=epoch)
+            if (epoch % 100 ==0) and (epoch <10000):
+               writer.add_figure('predictions vs. actuals TRAIN',
+                             plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
+                                                S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
+                             global_step=epoch)
             del output_train_full, loss
 
             ######################
@@ -327,11 +332,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            #if (epoch % 1000 ==0) and (epoch <10000):
-            #    writer.add_figure('predictions vs. actuals TEST',
-            #                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-            #                                     S_test_full_target.cpu().numpy(), R_test_full.cpu().numpy()),
-            #                  global_step=epoch)
+            if (epoch % 100 ==0) and (epoch <10000):
+               writer.add_figure('predictions vs. actuals TEST',
+                             plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+                                                S_test_full_target.cpu().numpy(), R_test_full.cpu().numpy()),
+                             global_step=epoch)
                 # writer.close()
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(

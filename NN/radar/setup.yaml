@@ -22,6 +22,8 @@ schedule_step:
   - 30000
 schedule_multiplier:
   - .1
+cosine_multiplier:
+  - .001
 patch_height:
   - 80
 patch_width:
