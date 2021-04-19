@@ -106,16 +106,17 @@ if __name__ == '__main__':
     S_rows = np.sum(np.abs(S_out), 1)
     plt.imshow(S_rows.T, aspect='auto')
     plt.subplot(122)
+    plt.title('Radar')
     radar = np.load('/home/spencer/research/radar-rgb-bfs/NN/radar/radar_frames_csl_lobby_700_likelihood.npy')[:30,::4]
     plt.imshow(radar.T,aspect='auto')
     plt.show()
 
-    S_radar_intersection = np.array(radar/np.max(radar)>.1,dtype=bool) * np.array(S_rows/np.max(S_rows)>.1,dtype=bool)
+    S_radar_intersection = np.array(radar/np.max(radar)>.2,dtype=bool) * np.array(S_rows/np.max(S_rows)>.1,dtype=bool)
     plt.imshow(S_radar_intersection.T, aspect='auto')
     plt.show()
 
     S_masked = S_radar_intersection[:, np.newaxis, :] * np.abs(S_out)
-    plt.imshow(S_masked[1])
+    plt.imshow(S_masked[10])
     plt.show()
     # Compute F-scores
 
