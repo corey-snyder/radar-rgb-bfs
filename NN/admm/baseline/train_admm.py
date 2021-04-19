@@ -10,9 +10,9 @@ import yaml
 from datetime import datetime
 import shutil
 import sys
-sys.path.append('../../baseline')
-from NN.baseline.tensorboard_helper import plot_classes_preds
-from NN.baseline.train import load_data, random_crop, pad_mat
+sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs/NN/baseline/')
+from train import plot_classes_preds
+from train import load_data, random_crop, pad_mat
 
 import matplotlib.pyplot as plt
 
@@ -211,7 +211,7 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            if (epoch % 100 ==0) and (epoch <10000):
+            if (epoch % 500 ==0) and (epoch <50000):
                writer.add_figure('predictions vs. actuals TRAIN',
                          plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
                          global_step=epoch)
@@ -228,11 +228,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            # if (epoch % 1000 ==0) and (epoch <10000):
-            #    writer.add_figure('predictions vs. actuals TEST',
-            #                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-            #                                     S_test_full_target.cpu().numpy()),
-            #                  global_step=epoch)
+            if (epoch % 500 ==0) and (epoch <50000):
+               writer.add_figure('predictions vs. actuals TEST',
+                             plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+                                                S_test_full_target.cpu().numpy()),
+                             global_step=epoch)
             # writer.close()
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(

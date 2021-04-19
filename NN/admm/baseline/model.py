@@ -25,6 +25,7 @@ class AdmmLayer(nn.Module):
         mu = .5  # assume mean abs value of input is .5
 
         self.lambda1 = nn.Parameter(torch.tensor([1/mu]))
+        # self.lambda1 = nn.Parameter(torch.tensor([.5]))
         self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
 
         self.mu1 = nn.Parameter(torch.tensor([1/mu]))
@@ -58,7 +59,7 @@ class AdmmLayer(nn.Module):
         L_out = L_stacked.T.reshape(-1, 1, self.im_height, self.im_width)
 
         # create k+1 lagrangian step
-        Y_out = Y + self.mu3 * (D-L_out-S_out)
+        Y_out = Y + self.mu3 * (D-self.p1(L_out)-self.p3(S_out))
 
         return D, L_out, S_out, Y_out
 
