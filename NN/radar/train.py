@@ -217,6 +217,8 @@ if __name__ == '__main__':
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
+    cosine_similarity = nn.CosineSimilarity(dim=1)
+
     # specify optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step)
@@ -256,6 +258,8 @@ if __name__ == '__main__':
         # forward pass: compute predicted outputs by passing inputs to the model
         output = model(D_train_patch, L_train_patch, S_train_patch, R_train_patch)
         # calculate the batch loss
+        rgb_rows = torch.sum(output[:,1],dim=1)
+        cos_los = -.1 * torch.mean(cosine_similarity(rgb_rows,R_train_patch[:,0]))
         loss = criterion(output, target_train_patch)
         # backward pass: compute gradient of the loss with respect to model parameters
         loss.backward()
