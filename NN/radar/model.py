@@ -65,7 +65,6 @@ class IstaLayer(nn.Module):
 
         L5_D1_S3 = L5+D1+S3
         L6_D2_S4 = L6+D2+S4
-        L6_D2_S4_radar = L6_D2_S4 * R7_2dim
 
         L5_D1_S3 = torch.reshape(L5_D1_S3,(-1,self.im_height*self.im_width)).T
 
@@ -77,7 +76,7 @@ class IstaLayer(nn.Module):
         D_out = D
         L_out = L_stacked.T.reshape(-1,1,self.im_height,self.im_width)
 
-        S_out = torch.sign(L6_D2_S4_radar)*self.threshold(torch.abs(L6_D2_S4_radar)-self.lambda2)
+        S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-self.lambda2) * R7_2dim
 
         return D_out, L_out, S_out, R
 
