@@ -207,7 +207,7 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_name = 'RADAR_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate)
+    log_name = 'RADAR_after_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate) + 'cos' + str(cosine_multiplier)
     log_dir = '../runs/'+log_name+'__'+dt_string
     writer = SummaryWriter(log_dir)
     shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
@@ -314,11 +314,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            if (epoch % 100 ==0) and (epoch <10000):
-               writer.add_figure('predictions vs. actuals TRAIN',
-                             plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
-                                                S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
-                             global_step=epoch)
+            # if (epoch % 100 ==0) and (epoch <10000):
+            #    writer.add_figure('predictions vs. actuals TRAIN',
+            #                  plot_classes_preds(output_train_full.cpu().detach().numpy(), L_train_full_target.cpu().numpy(),
+            #                                     S_train_full_target.cpu().numpy(), R_train_full.cpu().numpy()),
+            #                  global_step=epoch)
             del output_train_full, loss
 
             ######################
@@ -332,11 +332,11 @@ if __name__ == '__main__':
                               loss.item(),
                               epoch)
             # writer.close()
-            if (epoch % 100 ==0) and (epoch <10000):
-               writer.add_figure('predictions vs. actuals TEST',
-                             plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-                                                S_test_full_target.cpu().numpy(), R_test_full.cpu().numpy()),
-                             global_step=epoch)
+            # if (epoch % 100 ==0) and (epoch <10000):
+            #    writer.add_figure('predictions vs. actuals TEST',
+            #                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+            #                                     S_test_full_target.cpu().numpy(), R_test_full.cpu().numpy()),
+            #                  global_step=epoch)
                 # writer.close()
 
             print('Epoch: {} \tTraining Loss: {:.6f} \tTest Loss: {:.6f}'.format(
