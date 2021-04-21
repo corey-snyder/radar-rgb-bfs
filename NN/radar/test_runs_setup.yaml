@@ -1,5 +1,5 @@
 runs_dir:
-  - ../l2_radar_mult/
+  - ../l2_radar_in_cos/
 test_data:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 test_radar_data:
