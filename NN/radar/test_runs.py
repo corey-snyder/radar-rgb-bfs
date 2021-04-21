@@ -21,6 +21,7 @@ def display_dir_results(results_list):
         for run in results_list:
             vals.append(run[key]['f-measure'])
         print('F-score @ threshold {:.2f}:'.format(key))
+        if np.nan in vals: print('CONTAINS NAN(s)')
         print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.nanmin(vals),np.nanmax(vals),
                                                                            np.nanmean(vals), np.nanstd(vals)))
 
