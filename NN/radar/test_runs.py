@@ -20,7 +20,9 @@ def display_dir_results(results_list):
         vals = []
         for run in results_list:
             vals.append(run[key]['f-measure'])
-        print('F-score @ threshold {:.2f}:'.format(key))
+        
+        if True in np.isnan(np.array(vals)): print('F-score @ threshold {:.2f}: CONTAINS NAN(s)'.format(key))
+        else: print('F-score @ threshold {:.2f}:'.format(key))
         print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.nanmin(vals),np.nanmax(vals),
                                                                            np.nanmean(vals), np.nanstd(vals)))
 
