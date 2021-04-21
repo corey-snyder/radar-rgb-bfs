@@ -207,7 +207,7 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_name = 'RADAR_after_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate) + 'cos' + str(cosine_multiplier)
+    log_name = 'RADAR_after_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate) + '_cos_' + str(cosine_multiplier)
     log_dir = '../runs/'+log_name+'__'+dt_string
     writer = SummaryWriter(log_dir)
     shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
