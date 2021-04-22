@@ -1,0 +1,312 @@
+before_no_cos
+F-score @ threshold 0.00:
+Min: 0.085 | Max: 0.359 | Mean: 0.232 +/- 0.075
+F-score @ threshold 0.05:
+Min: 0.488 | Max: 0.681 | Mean: 0.606 +/- 0.057
+F-score @ threshold 0.10:
+Min: 0.600 | Max: 0.702 | Mean: 0.668 +/- 0.036
+F-score @ threshold 0.15:
+Min: 0.557 | Max: 0.675 | Mean: 0.642 +/- 0.043
+F-score @ threshold 0.20:
+Min: 0.498 | Max: 0.632 | Mean: 0.588 +/- 0.048
+F-score @ threshold 0.25:
+Min: 0.432 | Max: 0.559 | Mean: 0.517 +/- 0.046
+F-score @ threshold 0.30:
+Min: 0.362 | Max: 0.470 | Mean: 0.432 +/- 0.038
+F-score @ threshold 0.35:
+Min: 0.297 | Max: 0.385 | Mean: 0.353 +/- 0.032
+F-score @ threshold 0.40:
+Min: 0.232 | Max: 0.315 | Mean: 0.285 +/- 0.028
+F-score @ threshold 0.45:
+Min: 0.177 | Max: 0.249 | Mean: 0.225 +/- 0.024
+F-score @ threshold 0.50:
+Min: 0.132 | Max: 0.195 | Mean: 0.171 +/- 0.022
+F-score @ threshold 0.55:
+Min: 0.083 | Max: 0.141 | Mean: 0.121 +/- 0.018
+F-score @ threshold 0.60:
+Min: 0.054 | Max: 0.092 | Mean: 0.081 +/- 0.010
+F-score @ threshold 0.65:
+Min: 0.039 | Max: 0.065 | Mean: 0.059 +/- 0.007
+F-score @ threshold 0.70:
+Min: 0.026 | Max: 0.049 | Mean: 0.044 +/- 0.007
+F-score @ threshold 0.75:
+Min: 0.016 | Max: 0.037 | Mean: 0.032 +/- 0.006
+F-score @ threshold 0.80:
+Min: 0.009 | Max: 0.027 | Mean: 0.022 +/- 0.005
+F-score @ threshold 0.85:
+Min: 0.005 | Max: 0.020 | Mean: 0.014 +/- 0.004
+F-score @ threshold 0.90:
+Min: 0.001 | Max: 0.010 | Mean: 0.008 +/- 0.003
+F-score @ threshold 0.95:
+Min: 0.000 | Max: 0.005 | Mean: 0.003 +/- 0.001
+
+
+
+
+before_with_cos
+F-score @ threshold 0.00:
+Min: 0.069 | Max: 0.210 | Mean: 0.157 +/- 0.041
+F-score @ threshold 0.05:
+Min: 0.397 | Max: 0.669 | Mean: 0.575 +/- 0.085
+F-score @ threshold 0.10:
+Min: 0.587 | Max: 0.694 | Mean: 0.658 +/- 0.036
+F-score @ threshold 0.15:
+Min: 0.549 | Max: 0.671 | Mean: 0.630 +/- 0.039
+F-score @ threshold 0.20:
+Min: 0.493 | Max: 0.616 | Mean: 0.565 +/- 0.042
+F-score @ threshold 0.25:
+Min: 0.421 | Max: 0.548 | Mean: 0.488 +/- 0.039
+F-score @ threshold 0.30:
+Min: 0.347 | Max: 0.462 | Mean: 0.404 +/- 0.036
+F-score @ threshold 0.35:
+Min: 0.275 | Max: 0.381 | Mean: 0.326 +/- 0.032
+F-score @ threshold 0.40:
+Min: 0.208 | Max: 0.306 | Mean: 0.256 +/- 0.028
+F-score @ threshold 0.45:
+Min: 0.156 | Max: 0.240 | Mean: 0.199 +/- 0.025
+F-score @ threshold 0.50:
+Min: 0.103 | Max: 0.180 | Mean: 0.144 +/- 0.024
+F-score @ threshold 0.55:
+Min: 0.063 | Max: 0.123 | Mean: 0.098 +/- 0.017
+F-score @ threshold 0.60:
+Min: 0.041 | Max: 0.078 | Mean: 0.065 +/- 0.009
+F-score @ threshold 0.65:
+Min: 0.026 | Max: 0.059 | Mean: 0.047 +/- 0.007
+F-score @ threshold 0.70:
+Min: 0.016 | Max: 0.045 | Mean: 0.034 +/- 0.007
+F-score @ threshold 0.75:
+Min: 0.009 | Max: 0.032 | Mean: 0.024 +/- 0.006
+F-score @ threshold 0.80:
+Min: 0.004 | Max: 0.022 | Mean: 0.016 +/- 0.004
+F-score @ threshold 0.85:
+Min: 0.001 | Max: 0.014 | Mean: 0.009 +/- 0.003
+F-score @ threshold 0.90:
+Min: 0.000 | Max: 0.008 | Mean: 0.004 +/- 0.002
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.003 | Mean: 0.002 +/- 0.001
+
+
+
+
+in_no_cos
+F-score @ threshold 0.00: CONTAINS NAN(s)
+Min: 0.027 | Max: 0.402 | Mean: 0.201 +/- 0.154
+F-score @ threshold 0.05: CONTAINS NAN(s)
+Min: 0.144 | Max: 0.667 | Mean: 0.501 +/- 0.167
+F-score @ threshold 0.10: CONTAINS NAN(s)
+Min: 0.531 | Max: 0.703 | Mean: 0.636 +/- 0.059
+F-score @ threshold 0.15: CONTAINS NAN(s)
+Min: 0.543 | Max: 0.678 | Mean: 0.631 +/- 0.040
+F-score @ threshold 0.20: CONTAINS NAN(s)
+Min: 0.476 | Max: 0.641 | Mean: 0.573 +/- 0.048
+F-score @ threshold 0.25: CONTAINS NAN(s)
+Min: 0.419 | Max: 0.574 | Mean: 0.495 +/- 0.052
+F-score @ threshold 0.30: CONTAINS NAN(s)
+Min: 0.331 | Max: 0.484 | Mean: 0.406 +/- 0.055
+F-score @ threshold 0.35: CONTAINS NAN(s)
+Min: 0.242 | Max: 0.395 | Mean: 0.322 +/- 0.061
+F-score @ threshold 0.40: CONTAINS NAN(s)
+Min: 0.167 | Max: 0.319 | Mean: 0.245 +/- 0.062
+F-score @ threshold 0.45: CONTAINS NAN(s)
+Min: 0.099 | Max: 0.254 | Mean: 0.179 +/- 0.065
+F-score @ threshold 0.50: CONTAINS NAN(s)
+Min: 0.058 | Max: 0.197 | Mean: 0.129 +/- 0.058
+F-score @ threshold 0.55: CONTAINS NAN(s)
+Min: 0.036 | Max: 0.136 | Mean: 0.089 +/- 0.043
+F-score @ threshold 0.60: CONTAINS NAN(s)
+Min: 0.021 | Max: 0.086 | Mean: 0.056 +/- 0.027
+F-score @ threshold 0.65: CONTAINS NAN(s)
+Min: 0.011 | Max: 0.064 | Mean: 0.040 +/- 0.021
+F-score @ threshold 0.70: CONTAINS NAN(s)
+Min: 0.004 | Max: 0.048 | Mean: 0.028 +/- 0.018
+F-score @ threshold 0.75: CONTAINS NAN(s)
+Min: 0.001 | Max: 0.036 | Mean: 0.019 +/- 0.015
+F-score @ threshold 0.80: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.025 | Mean: 0.014 +/- 0.011
+F-score @ threshold 0.85: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.017 | Mean: 0.011 +/- 0.006
+F-score @ threshold 0.90: CONTAINS NAN(s)
+Min: 0.003 | Max: 0.009 | Mean: 0.007 +/- 0.002
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: 0.001 | Max: 0.004 | Mean: 0.003 +/- 0.001
+
+
+
+
+in_with_cos
+F-score @ threshold 0.00:
+Min: 0.027 | Max: 0.312 | Mean: 0.158 +/- 0.092
+F-score @ threshold 0.05:
+Min: 0.136 | Max: 0.614 | Mean: 0.485 +/- 0.124
+F-score @ threshold 0.10:
+Min: 0.527 | Max: 0.696 | Mean: 0.628 +/- 0.052
+F-score @ threshold 0.15:
+Min: 0.520 | Max: 0.675 | Mean: 0.618 +/- 0.047
+F-score @ threshold 0.20:
+Min: 0.463 | Max: 0.629 | Mean: 0.557 +/- 0.052
+F-score @ threshold 0.25:
+Min: 0.419 | Max: 0.558 | Mean: 0.483 +/- 0.051
+F-score @ threshold 0.30:
+Min: 0.331 | Max: 0.470 | Mean: 0.399 +/- 0.051
+F-score @ threshold 0.35:
+Min: 0.239 | Max: 0.395 | Mean: 0.319 +/- 0.054
+F-score @ threshold 0.40:
+Min: 0.165 | Max: 0.320 | Mean: 0.244 +/- 0.054
+F-score @ threshold 0.45:
+Min: 0.099 | Max: 0.254 | Mean: 0.181 +/- 0.056
+F-score @ threshold 0.50:
+Min: 0.054 | Max: 0.197 | Mean: 0.129 +/- 0.051
+F-score @ threshold 0.55:
+Min: 0.035 | Max: 0.144 | Mean: 0.088 +/- 0.037
+F-score @ threshold 0.60:
+Min: 0.021 | Max: 0.090 | Mean: 0.058 +/- 0.023
+F-score @ threshold 0.65:
+Min: 0.011 | Max: 0.061 | Mean: 0.041 +/- 0.018
+F-score @ threshold 0.70:
+Min: 0.003 | Max: 0.046 | Mean: 0.029 +/- 0.016
+F-score @ threshold 0.75:
+Min: 0.001 | Max: 0.035 | Mean: 0.021 +/- 0.013
+F-score @ threshold 0.80: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.025 | Mean: 0.014 +/- 0.009
+F-score @ threshold 0.85: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.016 | Mean: 0.010 +/- 0.005
+F-score @ threshold 0.90: CONTAINS NAN(s)
+Min: 0.002 | Max: 0.009 | Mean: 0.006 +/- 0.002
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.003 | Mean: 0.002 +/- 0.001
+
+
+
+
+after_no_cos
+F-score @ threshold 0.00:
+Min: 0.076 | Max: 0.400 | Mean: 0.235 +/- 0.093
+F-score @ threshold 0.05:
+Min: 0.371 | Max: 0.678 | Mean: 0.580 +/- 0.096
+F-score @ threshold 0.10:
+Min: 0.599 | Max: 0.711 | Mean: 0.658 +/- 0.037
+F-score @ threshold 0.15:
+Min: 0.519 | Max: 0.699 | Mean: 0.620 +/- 0.055
+F-score @ threshold 0.20:
+Min: 0.430 | Max: 0.652 | Mean: 0.560 +/- 0.066
+F-score @ threshold 0.25:
+Min: 0.367 | Max: 0.586 | Mean: 0.494 +/- 0.065
+F-score @ threshold 0.30:
+Min: 0.301 | Max: 0.471 | Mean: 0.413 +/- 0.056
+F-score @ threshold 0.35:
+Min: 0.244 | Max: 0.393 | Mean: 0.337 +/- 0.046
+F-score @ threshold 0.40:
+Min: 0.182 | Max: 0.320 | Mean: 0.272 +/- 0.041
+F-score @ threshold 0.45:
+Min: 0.139 | Max: 0.255 | Mean: 0.215 +/- 0.035
+F-score @ threshold 0.50:
+Min: 0.097 | Max: 0.202 | Mean: 0.163 +/- 0.031
+F-score @ threshold 0.55:
+Min: 0.057 | Max: 0.144 | Mean: 0.114 +/- 0.027
+F-score @ threshold 0.60:
+Min: 0.031 | Max: 0.095 | Mean: 0.078 +/- 0.018
+F-score @ threshold 0.65:
+Min: 0.018 | Max: 0.069 | Mean: 0.056 +/- 0.014
+F-score @ threshold 0.70:
+Min: 0.012 | Max: 0.053 | Mean: 0.041 +/- 0.012
+F-score @ threshold 0.75:
+Min: 0.006 | Max: 0.040 | Mean: 0.029 +/- 0.010
+F-score @ threshold 0.80:
+Min: 0.002 | Max: 0.028 | Mean: 0.020 +/- 0.008
+F-score @ threshold 0.85:
+Min: 0.000 | Max: 0.019 | Mean: 0.013 +/- 0.006
+F-score @ threshold 0.90: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.011 | Mean: 0.007 +/- 0.003
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.005 | Mean: 0.003 +/- 0.001
+
+
+
+
+after_with_cos
+F-score @ threshold 0.00:
+Min: 0.042 | Max: 0.209 | Mean: 0.136 +/- 0.048
+F-score @ threshold 0.05:
+Min: 0.408 | Max: 0.664 | Mean: 0.553 +/- 0.079
+F-score @ threshold 0.10:
+Min: 0.516 | Max: 0.692 | Mean: 0.636 +/- 0.054
+F-score @ threshold 0.15:
+Min: 0.451 | Max: 0.660 | Mean: 0.599 +/- 0.068
+F-score @ threshold 0.20:
+Min: 0.393 | Max: 0.612 | Mean: 0.539 +/- 0.071
+F-score @ threshold 0.25:
+Min: 0.332 | Max: 0.539 | Mean: 0.469 +/- 0.067
+F-score @ threshold 0.30:
+Min: 0.262 | Max: 0.448 | Mean: 0.389 +/- 0.060
+F-score @ threshold 0.35:
+Min: 0.194 | Max: 0.374 | Mean: 0.315 +/- 0.053
+F-score @ threshold 0.40:
+Min: 0.139 | Max: 0.305 | Mean: 0.248 +/- 0.049
+F-score @ threshold 0.45:
+Min: 0.095 | Max: 0.239 | Mean: 0.192 +/- 0.042
+F-score @ threshold 0.50:
+Min: 0.064 | Max: 0.184 | Mean: 0.141 +/- 0.037
+F-score @ threshold 0.55:
+Min: 0.042 | Max: 0.130 | Mean: 0.095 +/- 0.028
+F-score @ threshold 0.60:
+Min: 0.022 | Max: 0.084 | Mean: 0.062 +/- 0.019
+F-score @ threshold 0.65:
+Min: 0.012 | Max: 0.063 | Mean: 0.045 +/- 0.016
+F-score @ threshold 0.70:
+Min: 0.006 | Max: 0.046 | Mean: 0.032 +/- 0.013
+F-score @ threshold 0.75:
+Min: 0.002 | Max: 0.034 | Mean: 0.023 +/- 0.011
+F-score @ threshold 0.80:
+Min: 0.000 | Max: 0.022 | Mean: 0.015 +/- 0.008
+F-score @ threshold 0.85: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.014 | Mean: 0.009 +/- 0.005
+F-score @ threshold 0.90: CONTAINS NAN(s)
+Min: 0.000 | Max: 0.009 | Mean: 0.005 +/- 0.002
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: 0.001 | Max: 0.003 | Mean: 0.002 +/- 0.001
+
+
+
+
+baseline
+F-score @ threshold 0.00:
+Min: 0.077 | Max: 0.299 | Mean: 0.144 +/- 0.057
+F-score @ threshold 0.05:
+Min: 0.226 | Max: 0.707 | Mean: 0.456 +/- 0.154
+F-score @ threshold 0.10:
+Min: 0.372 | Max: 0.735 | Mean: 0.578 +/- 0.127
+F-score @ threshold 0.15:
+Min: 0.498 | Max: 0.718 | Mean: 0.616 +/- 0.059
+F-score @ threshold 0.20:
+Min: 0.483 | Max: 0.703 | Mean: 0.614 +/- 0.066
+F-score @ threshold 0.25:
+Min: 0.404 | Max: 0.661 | Mean: 0.550 +/- 0.077
+F-score @ threshold 0.30:
+Min: 0.333 | Max: 0.587 | Mean: 0.471 +/- 0.086
+F-score @ threshold 0.35:
+Min: 0.265 | Max: 0.515 | Mean: 0.387 +/- 0.082
+F-score @ threshold 0.40:
+Min: 0.207 | Max: 0.406 | Mean: 0.300 +/- 0.063
+F-score @ threshold 0.45:
+Min: 0.155 | Max: 0.309 | Mean: 0.230 +/- 0.050
+F-score @ threshold 0.50:
+Min: 0.103 | Max: 0.247 | Mean: 0.170 +/- 0.046
+F-score @ threshold 0.55:
+Min: 0.067 | Max: 0.190 | Mean: 0.123 +/- 0.039
+F-score @ threshold 0.60:
+Min: 0.040 | Max: 0.138 | Mean: 0.087 +/- 0.028
+F-score @ threshold 0.65:
+Min: 0.028 | Max: 0.091 | Mean: 0.061 +/- 0.017
+F-score @ threshold 0.70:
+Min: 0.017 | Max: 0.060 | Mean: 0.042 +/- 0.010
+F-score @ threshold 0.75:
+Min: 0.009 | Max: 0.044 | Mean: 0.030 +/- 0.008
+F-score @ threshold 0.80:
+Min: 0.004 | Max: 0.031 | Mean: 0.020 +/- 0.007
+F-score @ threshold 0.85:
+Min: 0.001 | Max: 0.024 | Mean: 0.013 +/- 0.006
+F-score @ threshold 0.90: CONTAINS NAN(s)
+Min: nan | Max: nan | Mean: nan +/- nan
+F-score @ threshold 0.95: CONTAINS NAN(s)
+Min: nan | Max: nan | Mean: nan +/- nan
+
