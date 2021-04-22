@@ -1,11 +1,11 @@
 runs_dir:
   - ../l2_radar_in_cos/
 test_data:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
 test_radar_data:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
+    - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry/radar_frames_csl_pantry_likelihood.npy
 GT:
-  - ../../RGB_images/groundtruth
+  - ../../RGB_images_csl_pantry/groundtruth
 try_gpu:
   - True
 step_height:
