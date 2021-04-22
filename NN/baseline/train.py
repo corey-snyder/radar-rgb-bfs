@@ -161,7 +161,8 @@ if __name__ == '__main__':
     patch_height = setup_dict['patch_height'][0]
     patch_width = setup_dict['patch_width'][0]
     mask_bool = setup_dict['mask'][0]
-    seed = setup_dict['seed'][0]
+    try: seed = setup_dict['seed'][0]
+    except: seed = setup_dict['seed']
     S_train_path = setup_dict['S_train'][0] 
     L_train_path = setup_dict['L_train'][0]
     S_test_path = setup_dict['S_test'][0]
@@ -184,11 +185,11 @@ if __name__ == '__main__':
         print('CUDA is available!  Training on GPU ...')
 
     # load Data (not dataset object since no train/test split)
-    D_train_full,L_train_full_target,S_train_full_target = load_data(train_path,rescale_factor=downsample_rate, S=S_train_path, L=L_train_path, mask_bool=mask_bool)
+    D_train_full,L_train_full_target,S_train_full_target = load_data(train_path,rescale_factor=downsample_rate, S=S_train_path, L=L_train_path)
     target_train_full = torch.cat((L_train_full_target,S_train_full_target),1)  # concatenate the L and S in the channel dimension
     D_train_full.to(device)
 
-    D_test_full, L_test_full_target, S_test_full_target = load_data(test_path, rescale_factor=downsample_rate, S=S_test_path, L=L_test_path, mask_bool=mask_bool)
+    D_test_full, L_test_full_target, S_test_full_target = load_data(test_path, rescale_factor=downsample_rate, S=S_test_path, L=L_test_path)
     target_test_full = torch.cat((L_test_full_target, S_test_full_target), 1)  # concatenate the L and S in the channel dimension
     D_test_full.to(device)
 
