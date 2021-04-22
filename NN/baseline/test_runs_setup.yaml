@@ -1,12 +1,12 @@
 runs_dir:
-  - ../runs/OG/
+  - ../l2_og/
 test_data:
-  - ../../output/csl_lobby_700
+  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 GT:
   - ../../RGB_images/groundtruth
 try_gpu:
   - True
 step_height:
-  - 40
+  - 30
 step_width:
-  - 40
+  - 30
