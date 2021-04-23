@@ -50,7 +50,7 @@ class IstaLayer(nn.Module):
         For example, L convolved with P_5 will be labeled L5
         """
         # print(self.lambda1, self.lambda2)
-        (D,L,S,R) = input
+        (D,L,S,R,save_sparse) = input
 
         L5 = self.p5(L)
         L6 = self.p6(L)
@@ -77,7 +77,10 @@ class IstaLayer(nn.Module):
 
         S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-nn.functional.relu(R7_2dim)*self.lambda2)
 
-        return D_out, L_out, S_out, R
+        if save_sparse:
+            return D_out, L_out, S_out, R, save_sparse, L6_D2_S4
+
+        return D_out, L_out, S_out, R, save_sparse
 
 
 class IstaNet(nn.Module):
@@ -99,14 +102,25 @@ class IstaNet(nn.Module):
                 self.layers.append(IstaLayer(self.im_height, self.im_width, self.n_channels, im_kernel_size=im_kernel_size,
                                    im_padding=im_padding,  radar_kernel_size = radar_kernel_size,radar_padding=radar_kernel_padding))
 
-        def forward(self, D, L, S, R):
+        def forward(self, D, L, S, R, save_sparse=False):
             """
             :param input: tuple of D,L,S
             :return: tuple of D, L, S
             """
-            components = (D,L,S,R)
-            for layer in self.layers:
-                components = layer(components)
-            (D,L,S,R) = components
+            if not save_sparse:
+                components = (D,L,S,R,save_sparse)
+                for layer in self.layers:
+                    components = layer(components)
+                (D,L,S,R,save_sparse) = components
 
-            return torch.cat((L,S),1)
+                return torch.cat((L,S),1)
+
+            else:
+                L6_D2_S4_list = []
+                components = (D, L, S, R, save_sparse)
+                for layer in self.layers:
+                    components = layer(components)
+                    L6_D2_S4_list.append(components[-1])
+                    components = components[:-1]
+                (D, L, S, R, save_sparse) = components
+                return torch.cat((L, S), 1), torch.cat(L6_D2_S4_list,1)
