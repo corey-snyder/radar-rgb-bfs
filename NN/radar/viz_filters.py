@@ -43,14 +43,14 @@ def view_sparse_progressions(full_rgb_input, full_radar_input, network, patch_sh
     (height_step, width_step) = step_shape
     (patch_height,patch_width) = np.array(patch_shape[-2:])
     (batch_size,channels,og_height, og_width) = full_rgb_input.shape
-
+    n_layers = len(network.layers)
     # determine padding (need to pad so that the size of the input is matches the patch/step size)
     padded_rgb_input, padded_radar_input = pad_mat(full_rgb_input, full_radar_input, (patch_height,patch_width),(height_step, width_step))
 
     patches_rgb = padded_rgb_input.unfold(2, size=int(patch_height), step=int(height_step)).unfold(3, size=int(patch_width), step=int(width_step))
     patches_radar = padded_radar_input.unfold(2, size=int(patch_width), step=int(width_step))
     patches_out = torch.zeros((batch_size, 2, patches_rgb.shape[2], patches_rgb.shape[3], patch_height, patch_width)).to(device)
-    sparse_out = torch.zeros((batch_size, 2, patches_rgb.shape[2], patches_rgb.shape[3], patch_height, patch_width)).to(device)
+    sparse_out = torch.zeros((batch_size, n_layers, patches_rgb.shape[2], patches_rgb.shape[3], patch_height, patch_width)).to(device)
     for ii in range(patches_rgb.shape[2]):
         for jj in range(patches_rgb.shape[3]):
             patch_rgb_input = patches_rgb[:,:,ii,jj].to(device)
@@ -62,13 +62,13 @@ def view_sparse_progressions(full_rgb_input, full_radar_input, network, patch_sh
     # fold data
     # reshape output to match F.fold input
     patches_out = patches_out.contiguous().view(batch_size, 2, -1, patch_height*patch_width)
-    sparse_out = sparse_out.contiguous().view(batch_size, 2, -1, patch_height * patch_width)
+    sparse_out = sparse_out.contiguous().view(batch_size, n_layers, -1, patch_height * patch_width)
     # print(patches_out.shape)  # [B, C, nb_patches_all, kernel_size*kernel_size]
     patches_out = patches_out.permute(0, 1, 3, 2)
     sparse_out = sparse_out.permute(0, 1, 3, 2)
     # print(patches_out.shape)  # [B, C, kernel_size*kernel_size, nb_patches_all]
     patches_out = patches_out.contiguous().view(batch_size, 2 * patch_height * patch_width, -1)
-    sparse_out = sparse_out.contiguous().view(batch_size, 2 * patch_height * patch_width, -1)
+    sparse_out = sparse_out.contiguous().view(batch_size, n_layers * patch_height * patch_width, -1)
     # print(patches_out.shape)  # [B, C*prod(kernel_size), L] as expected by Fold
     # https://pytorch.org/docs/stable/nn.html#torch.nn.Fold
 
@@ -81,16 +81,16 @@ def view_sparse_progressions(full_rgb_input, full_radar_input, network, patch_sh
 
     # fold ones
     ones_tensor = torch.ones_like(patches_out).to(device)
-
+    ones_sparse_tensor = torch.ones_like(sparse_out).to(device)
     # memory saver
     del L_patch_input, S_patch_input, patch_radar_input, patches_out, sparse_out
     torch.cuda.empty_cache()
 
     ones_tensor = fold(ones_tensor)
-
+    ones_sparse_tensor = fold(ones_sparse_tensor)
     # data /ones
     padded_output = padded_output / ones_tensor
-    padded_sparse_checkpoints = padded_sparse_checkpoints / ones_tensor
+    padded_sparse_checkpoints = padded_sparse_checkpoints / ones_sparse_tensor
 
     full_output = padded_output[:,:,:og_height,:og_width].to(device)
     full_sparse_checkpoints = padded_sparse_checkpoints[:,:,:og_height,:og_width].to(device)
@@ -123,8 +123,6 @@ def plot_data(full_rgb_input, full_radar_input, model, patch_shape, step_shape, 
     plt.title('Radar Input')
     plt.xticks([])
 
-    plt.show()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -156,5 +154,5 @@ if __name__ == '__main__':
     model.eval()
 
     plot_data(D[:30], R[:30], model, data_shape, [30, 30], 10, 'cpu')
-
     plot_weights(model)
+    plt.show()
