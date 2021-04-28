@@ -1,11 +1,11 @@
 run_path:
-  - ../runs/OG_l2_lr_0.001_ds_0.25__21-04-2021_11-31-28
+  - /home/spencer/research/radar-rgb-bfs/NN/runs/l2_og/OG_l2_lr_0.001_ds_0.25__21-04-2021_11-31-28
 test_path:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
-  -  /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
-#  - ../../output/csl_lobby_700
+#  -  /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
+  - ../../output/csl_pantry
 try_gpu:
   - True
 GT:
