@@ -13,6 +13,6 @@ GT:
 #  - ../../RGB_images_csl_lobby_side_0/groundtruth
   - ../../RGB_images_csl_pantry/groundtruth
 step_height:
-  - 40
+  - 30
 step_width:
-  - 40
+  - 30
