@@ -1,5 +1,5 @@
 runs_dir:
-  - ../l2_radar_before/
+  - ../l8_radar_before/
 test_data:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
 test_radar_data:

@@ -5,7 +5,7 @@ train_path:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
 #  - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
 n_layers:
-  - 2
+  - 8
 downsample:
   - .25
 try_gpu:
@@ -23,7 +23,7 @@ patch_width:
 mask:
   - False
 seed:
-  - 5
+  - 0
 S_train:
   - null
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700/S_radar_3.0_0.5_pcp.npy

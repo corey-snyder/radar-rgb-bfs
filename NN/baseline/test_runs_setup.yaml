@@ -1,5 +1,5 @@
 runs_dir:
-  - ../l2_og/
+  - ../l8_og/
 test_data:
   - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
 GT:

@@ -1,5 +1,5 @@
 run_path:
-  - ../runs/OG_l2_lr_0.001_ds_0.25__21-04-2021_11-31-28
+  - ../l8_og/OG_l8_lr_0.001_ds_0.25__01-05-2021_02-32-07
 test_path:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
@@ -13,6 +13,6 @@ GT:
 #  - ../../RGB_images_csl_lobby_side_0/groundtruth
   - ../../RGB_images_csl_pantry/groundtruth
 step_height:
-  - 40
+  - 30
 step_width:
-  - 40
+  - 30

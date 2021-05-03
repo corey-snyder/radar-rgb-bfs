@@ -1,6 +1,7 @@
 run_path:
-#  - ../l2_radar_before/RADAR_before_l2_lr_0.001_ds_0.25cos0__19-04-2021_17-20-23
-  - ../l2_radar_before_cos/RADAR_before_l2_lr_0.001_ds_0.25cos0.001__19-04-2021_16-28-50
+  - ../l2_radar_before/RADAR_before_l2_lr_0.001_ds_0.25cos0__19-04-2021_18-21-48
+#  - ../l2_radar_before_cos/RADAR_before_l2_lr_0.001_ds_0.25cos0.001__19-04-2021_16-28-50
+#  - ../runs/RADAR_before_l8_lr_0.001_ds_0.25cos0__29-04-2021_16-03-38
 test_path:
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
 #  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
