@@ -10,20 +10,49 @@ import os
 from skimage.io import imread
 import sys
 sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
-from evaluate import compute_metrics, display_results
+from evaluate import compute_metrics, display_results, ROC_curve
+
+
+def pad_or_truncate(some_list, target_len):
+    return np.concatenate([some_list,np.array(np.nan*np.ones(target_len - len(some_list)))])
 
 
 def display_dir_results(results_list):
     keys = results_list[0].keys()
+    all_FPRS = []
+    all_TPRS = []
+    plt.figure()
     for key in keys:
         vals = []
         for run in results_list:
             vals.append(run[key]['f-measure'])
+            FPRS, TPRS, interp_FPRS, interp_TPRS = ROC_curve(run,False)
+            plt.plot(interp_FPRS,interp_TPRS,'--', alpha=.01)
+            all_TPRS.append(interp_TPRS)
+            all_FPRS.append(interp_FPRS)
+
         if True in np.isnan(np.array(vals)): print('F-score @ threshold {:.2f}: CONTAINS NAN(s)'.format(key))
         else: print('F-score @ threshold {:.2f}:'.format(key))
         print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.min(vals),np.max(vals),
                                                                            np.mean(vals), np.std(vals)))
 
+    max_len = 0
+    for FPRS in all_FPRS:
+        if len(FPRS) > max_len:
+            max_len = len(FPRS)
+            max_FPRS = FPRS
+
+    all_TPRS = np.array([pad_or_truncate(ii,max_len)for ii in all_TPRS])
+
+    TPRS_means = np.nanmean(all_TPRS,0)
+
+    plt.plot(max_FPRS,TPRS_means)
+    plt.title('ROC Curve')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.show()
+
+    return max_FPRS, TPRS_means
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -100,4 +129,9 @@ if __name__ == '__main__':
         # display_results(temp_results)
         results.append(temp_results)
     print('\n')
-    display_dir_results(results)
+    [FPRS, TPRS] = display_dir_results(results)
+    np.save('l8_og_roc_csl_pantry.npy',[FPRS, TPRS],allow_pickle=True)
+
+
+
+

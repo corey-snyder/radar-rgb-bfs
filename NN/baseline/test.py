@@ -10,7 +10,7 @@ import os
 from skimage.io import imread
 import sys
 sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
-from evaluate import compute_metrics, display_results
+from evaluate import compute_metrics, display_results, ROC_curve
 
 
 def plot_func(output,D):
@@ -111,3 +111,4 @@ if __name__ == '__main__':
     print('Computing full metrics...')
     results = compute_metrics(gt_images, pred_images, thresholds, False)
     display_results(results)
+    ROC_curve(results,True)

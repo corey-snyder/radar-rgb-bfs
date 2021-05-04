@@ -1,11 +1,12 @@
 runs_dir:
-  - ../l8_og/
+  - ../runs/l8_og/
 test_data:
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
+#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
+  - ../../output/csl_pantry
 GT:
   - ../../RGB_images_csl_pantry/groundtruth
 try_gpu:
-  - True
+  - False
 step_height:
   - 30
 step_width:
