@@ -5,6 +5,8 @@ import numpy as np
 from scipy import interpolate,integrate
 from argparse import ArgumentParser
 from skimage.io import imread
+from sklearn import metrics
+
 
 def load_images(gt_path, pred_path):
     filenames = os.listdir(gt_path)
@@ -30,6 +32,8 @@ def display_results(results_dict):
                                                                               results_dict[threshold]['f-measure']))
 
 def compute_metrics(gt_images, pred_images, thresholds, subsample):
+    # gt_images = gt_images[:12]
+    # pred_images = pred_images[:12]
     count_dict = {}
     for t in thresholds:
         count_dict[t] = {'true_positive': 0, 'predicted_positive': 0, 'gt_positive': 0, 'false_positive': 0,
@@ -37,59 +41,45 @@ def compute_metrics(gt_images, pred_images, thresholds, subsample):
     for i in range(len(gt_images)):
         gt_image = gt_images[i]
         gt_image = prepare_gt(gt_image, subsample)
+        gt_images[i] = gt_image
+
         for t in thresholds:
             pred_image = pred_images[i]
             pred_image = (pred_image/255) > t # assume images are saved as np.uint8 type
             count_dict[t]['true_positive'] += np.sum(np.logical_and(pred_image, gt_image))
-            count_dict[t]['false_positive'] += np.sum(np.logical_and(pred_image,np.logical_not(gt_image)))
-            count_dict[t]['true_negative'] += np.sum(np.logical_and(np.logical_not(pred_image), np.logical_not(gt_image)))
-            count_dict[t]['false_negative'] += np.sum(np.logical_and(np.logical_not(pred_image),gt_image))
+            # count_dict[t]['false_positive'] += np.sum(np.logical_and(pred_image,np.logical_not(gt_image)))
+            # count_dict[t]['true_negative'] += np.sum(np.logical_and(np.logical_not(pred_image), np.logical_not(gt_image)))
+            # count_dict[t]['false_negative'] += np.sum(np.logical_and(np.logical_not(pred_image),gt_image))
             count_dict[t]['predicted_positive'] += np.sum(pred_image)
             count_dict[t]['gt_positive'] += np.sum(gt_image)
+
+    fpr, tpr, _ = metrics.roc_curve(np.array(gt_images).flatten(), np.array(pred_images).flatten())
+    auc = metrics.roc_auc_score(np.array(gt_images).flatten(), np.array(pred_images).flatten())
     results_dict = {}
     for t in thresholds:
         results_dict[t] = {}
         results_dict[t]['precision'] = count_dict[t]['true_positive']/count_dict[t]['predicted_positive']
         results_dict[t]['recall'] = count_dict[t]['true_positive']/count_dict[t]['gt_positive']
         results_dict[t]['f-measure'] = 2*results_dict[t]['precision']*results_dict[t]['recall']/(results_dict[t]['precision']+results_dict[t]['recall']+1e-9)
-        results_dict[t]['TPR'] = count_dict[t]['true_positive']/(count_dict[t]['true_positive']+count_dict[t]['false_negative'])
-        results_dict[t]['FPR'] = count_dict[t]['false_positive']/(count_dict[t]['false_positive']+count_dict[t]['true_negative'])
+        results_dict[t]['TPR'] = tpr
+        results_dict[t]['FPR'] = fpr
+        results_dict[t]['AUC'] = auc
     return results_dict
 
-
 def ROC_curve(results_dict, plot=False):
-    FPRS = []
-    TPRS = []
-
-    for threshold in np.sort(list(results_dict.keys())):
-        FPRS.append(results_dict[threshold]['FPR'])
-        TPRS.append(results_dict[threshold]['TPR'])
-    FPRS_TPRS = sorted(zip(FPRS,TPRS))
-    FPRS = [x for x,y in FPRS_TPRS]
-    TPRS = [y for x,y in FPRS_TPRS]
-
-    # interpolation
-    # need to prune multiple FPR=0 entries and pick largest
-    try:
-        last_zero_idx = np.max([i for i, x in enumerate(FPRS) if x == 0])
-        FPRS_pruned, TPRS_pruned = FPRS[last_zero_idx:],TPRS[last_zero_idx:]
-    except:
-        FPRS_pruned, TPRS_pruned = np.concatenate([[0],FPRS]), np.concatenate([[0],TPRS])
-    f = interpolate.interp1d(FPRS_pruned,TPRS_pruned,'linear')
-    interp_FPRS = np.arange(0, FPRS_pruned[-1],.001)
-    interp_TPRS = f(interp_FPRS)
-    AUC = integrate.simps(interp_TPRS, interp_FPRS, even='avg')
+    tpr = results_dict[0]['TPR']
+    fpr = results_dict[0]['FPR']
+    auc = results_dict[0]['AUC']
 
     if plot:
         plt.figure()
-        plt.plot(FPRS,TPRS,'*')
-        plt.plot(interp_FPRS,interp_TPRS,'--')
-        plt.title('ROC Curve {:.3f}'.format(AUC) )
+        plt.plot(fpr,tpr)
+        plt.title('ROC Curve {:.3f}'.format(auc))
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.show()
 
-    return FPRS_pruned, TPRS_pruned, interp_FPRS, interp_TPRS
+    return fpr, tpr, auc
 
 if __name__ == '__main__':
     '''
