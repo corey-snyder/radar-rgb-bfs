@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 from pcp import _svd, shrink
 
 
-def ista(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
-        svd_method="approximate", plot_num=None, im_shape=None, **svd_args):
+def ista(M, delta=1e-6, mu=None, maxiter=400, verbose=False, missing_data=True,
+        svd_method="approximate", plot_num=None, im_shape=None, im_idx=0, **svd_args):
     # Check the SVD method.
     allowed_methods = ["approximate", "exact", "sparse"]
     if svd_method not in allowed_methods:
@@ -89,18 +89,18 @@ def ista(M, delta=1e-6, mu=None, maxiter=500, verbose=False, missing_data=True,
                     print('Need im shape')
                     continue
                 plt.figure()
-                plt.subplot(211)
-                plt.imshow(L[:,0].reshape(im_shape),cmap='gray')
-                plt.subplot(212)
-                plt.imshow(np.abs(S[:,0]).reshape(im_shape),vmin=0,vmax=1,cmap='gray')
+                plt.subplot(121)
+                plt.imshow(L[:,im_idx].reshape(im_shape),cmap='gray')
+                plt.subplot(122)
+                plt.imshow(np.abs(S[:,im_idx]).reshape(im_shape),vmin=0,vmax=1,cmap='gray')
                 plt.show()
 
-        if err < delta:
-            break
+        # if err < delta:
+        #     break
         i += 1
 
-    if i >= maxiter:
-        logging.warn("convergence not reached in pcp")
+    # if i >= maxiter:
+    #     logging.warn("convergence not reached in pcp")
     return L, S, (u, s, v), errors, ranks, nnzs
 
 
