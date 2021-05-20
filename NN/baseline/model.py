@@ -6,8 +6,6 @@ Deep Unfolded Robust PCA with Application to Clutter Suppression in Ultrasound
 import torch
 import torch.nn as nn
 import numpy as np
-from torch.utils.tensorboard import SummaryWriter
-import torch.nn.functional as F
 
 
 class IstaLayer(nn.Module):
@@ -36,9 +34,6 @@ class IstaLayer(nn.Module):
         # notice in line below, mu is multiplied by 2
         self.lambda1 = nn.Parameter(torch.tensor([2/mu]))
         self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
-
-        # self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
-        # self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
 
         self.threshold = nn.Threshold(0,0)
 
@@ -96,12 +91,11 @@ class IstaNet(nn.Module):
                 padding = int(np.floor(kernel_size / 2))
                 self.layers.append(IstaLayer(self.im_height, self.im_width, self.n_channels, kernel_size, padding=padding))
 
-        def forward(self,D,L,S):
-            """
-            :param input: tuple of D,L,S
-            :return: tuple of D, L, S
-            """
+        def forward(self, D):
+            S = torch.zeros_like(D)
+            L = torch.zeros_like(D)
             components = (D,L,S)
+
             for layer in self.layers:
                 components = layer(components)
             (D,L,S) = components
