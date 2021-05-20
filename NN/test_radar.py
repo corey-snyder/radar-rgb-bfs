@@ -35,7 +35,6 @@ if __name__ == '__main__':
     step_height = setup_dict['step_height']
     step_width = setup_dict['step_width']
 
-
     # if groundtruth is linked, provide F-score and AUC/ROC results
     if 'GT' in setup_dict:
         print('Computing Quantitative Results')
