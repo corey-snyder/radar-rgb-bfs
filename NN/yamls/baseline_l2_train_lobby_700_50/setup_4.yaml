@@ -1,0 +1,12 @@
+train_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_700/raw
+test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_side_0/raw
+n_layers: 2
+try_gpu: True
+downsample: .25
+lr: .001
+schedule_step: 30000
+schedule_multiplier: .1
+patch_height: 80
+patch_width: 80
+seed: 4
+seq_len: 50
