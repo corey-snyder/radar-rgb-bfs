@@ -42,7 +42,6 @@ if __name__ == '__main__':
     radar_inclusion_type = setup_dict['radar_inclusion_type']
     cosine_multiplier = setup_dict['cosine_multiplier']
 
-
     # set seeds
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -131,7 +130,7 @@ if __name__ == '__main__':
 
             model.eval()
             step_shape = np.array(data_shape[-2:]) // 2
-            output_train_full = infer_full_image_radar(D_train_full, R_train_full, model, data_shape, step_shape, device)
+            output_train_full = infer_full_image(D_train_full, model, data_shape, step_shape, device, R=R_train_full)
 
             # compute pixel loss of entire training image sequence
             target_train_full.to(device)
@@ -155,7 +154,7 @@ if __name__ == '__main__':
             del output_train_full
 
             # compute pixel loss of entire testing image sequence
-            output_test_full = infer_full_image_radar(D_test_full, R_test_full, model, data_shape, step_shape, device)
+            output_test_full = infer_full_image(D_test_full, model, data_shape, step_shape, device, R=R_test_full,)
             MSE_valid_loss = criterion(output_test_full, target_test_full.to(device))
             writer.add_scalar('Testing Avg. Pixel MSE Loss',
                               MSE_valid_loss.item(),
