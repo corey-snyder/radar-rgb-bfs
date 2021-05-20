@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from radar.model import IstaNet
 from utils.data_loader import *
 from utils.patch_utils import *
-from utils.plot_utils import plot_func
+from utils.plot_utils import *
 from utils.evaluation_utils import *
 from utils.tensorboard_utils import plot_classes_preds
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     output, D = output.detach().cpu().numpy(), D.detach().cpu().numpy()
 
     plot_func(output, D)
-
+    plot_func_radar(output, D, R)
     # Compute Quantitative Results
     if quant_flag:
 

@@ -1,4 +1,4 @@
-run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/RADAR_after_l2_lr0.001_ds0.25_seed0_cos0__20-05-2021_13-45-07
+run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/RADAR_after_l2_lr0.001_ds0.25_seed0_len50_cos0__20-05-2021_13-56-55
 #run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/BASELINE_l2_lr0.001_ds0.25_seed0__19-05-2021_21-15-50
 test_path: /home/spencer/research/radar-rgb-bfs/Data/CSL_lobby_700/raw
 try_gpu: True
