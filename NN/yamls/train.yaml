@@ -9,7 +9,7 @@ schedule_multiplier: .1
 patch_height: 80
 patch_width: 80
 seed: 0
-seq_len: 30
+seq_len: 50
 
 # Radar params will only be read in train_radar.py and test_radar.py
 
@@ -17,4 +17,4 @@ seq_len: 30
 radar_inclusion_type: 'after'
 
 # set to zero to get rid of cosine multiplier
-cosine_multiplier: .001
+cosine_multiplier: 0

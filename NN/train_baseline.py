@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_name = 'BASELINE_l' + str(n_layers) + '_lr' + str(learning_rate) + '_ds' + str(downsample_rate) + '_seed' + str(seed)
+    log_name = 'BASELINE_l' + str(n_layers) + '_lr' + str(learning_rate) + '_ds' + str(downsample_rate) + '_seed' + str(seed) + '_len' + str(seq_len)
     log_dir = './runs/' + log_name + '__' + dt_string
     writer = SummaryWriter(log_dir)
     shutil.copyfile(yaml_path, log_dir + '/train.yaml')
