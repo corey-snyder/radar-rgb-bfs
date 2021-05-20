@@ -21,10 +21,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
     args = parser.parse_args()
-    yampl_path = args.yaml
+    yaml_path = args.yaml
 
     # Load yaml and get contents
-    with open(yampl_path) as file:
+    with open(yaml_path) as file:
         setup_dict = yaml.load(file,Loader=yaml.FullLoader)
 
     train_path = setup_dict['train_path']
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     log_name = 'BASELINE_l' + str(n_layers) + '_lr' + str(learning_rate) + '_ds' + str(downsample_rate) + '_seed' + str(seed)
     log_dir = './runs/' + log_name + '__' + dt_string
     writer = SummaryWriter(log_dir)
-    shutil.copyfile(yampl_path, log_dir + '/train.yaml')
+    shutil.copyfile(yaml_path, log_dir + '/train.yaml')
 
     # init model
     data_shape = list(np.concatenate([D_train_full.shape[:2], [patch_height, patch_width]]))
@@ -166,4 +166,3 @@ if __name__ == '__main__':
                 valid_loss_min = valid_loss
 
         scheduler.step()
-    pass

@@ -10,3 +10,11 @@ patch_height: 80
 patch_width: 80
 seed: 0
 seq_len: 30
+
+# Radar params will only be read in train_radar.py and test_radar.py
+
+# radar_inclusion_type options: 'in' 'before', 'after'
+radar_inclusion_type: 'after'
+
+# set to zero to get rid of cosine multiplier
+cosine_multiplier: .001
