@@ -6,3 +6,10 @@
 events.*
 NN/runs/*/*/*.yaml
 output/*/*.npy
+NN/admm/runs/*
+Data/*
+NN/*/roc_auc/*
+NN/*/bad_rocs/*
+NN/runs/*
+notebooks/*.npy
+NN/old_runs/*
