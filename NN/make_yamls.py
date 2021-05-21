@@ -15,11 +15,10 @@ if __name__ == '__main__':
     with open(yaml_template) as f:
         list_doc = yaml.load(f, Loader=yaml.FullLoader)
     
-    for ii in range(n):
-        list_doc['seed'] = ii
-        print(out_dir + "setup_" + str(ii) + ".yaml")
-        with open(out_dir + "setup_" + str(ii) + ".yaml", "w+") as f:
-            yaml.dump(list_doc, f)
-
-
-
+    for model_type in ['in','before','after']:
+        for ii in range(n):
+            list_doc['seed'] = ii
+            list_doc['radar_inclusion_type'] = model_type
+            print(out_dir + "setup_" + model_type + '_' + str(ii) + ".yaml")
+            with open(out_dir + "setup_" + model_type + '_' + str(ii) + ".yaml", "w+") as f:
+                yaml.dump(list_doc, f)

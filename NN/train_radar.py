@@ -146,10 +146,10 @@ if __name__ == '__main__':
                                   cos_loss.item(),
                                   epoch)
 
-            if (epoch % 250 ==0) and (epoch < 10000):
-               writer.add_figure('Predictions vs. Targets TRAIN',
-                         plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
-                         global_step=epoch)
+            # if (epoch % 250 ==0) and (epoch < 10000):
+            #    writer.add_figure('Predictions vs. Targets TRAIN',
+            #              plot_classes_preds(output_train_full.cpu().detach().numpy(),L_train_full_target.cpu().numpy(),S_train_full_target.cpu().numpy()),
+            #              global_step=epoch)
 
             del output_train_full
 
@@ -167,11 +167,11 @@ if __name__ == '__main__':
                                   cos_loss.item(),
                                   epoch)
 
-            if (epoch % 250 == 0) and (epoch < 10000):
-                writer.add_figure('Predictions vs. Targets TEST',
-                                  plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
-                                                     S_test_full_target.cpu().numpy()),
-                                  global_step=epoch)
+            # if (epoch % 250 == 0) and (epoch < 10000):
+            #     writer.add_figure('Predictions vs. Targets TEST',
+            #                       plot_classes_preds(output_test_full.cpu().detach().numpy(), L_test_full_target.cpu().numpy(),
+            #                                          S_test_full_target.cpu().numpy()),
+            #                       global_step=epoch)
 
             del output_test_full
 
