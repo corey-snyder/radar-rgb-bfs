@@ -5,3 +5,4 @@ try_gpu: True
 GT: /home/spencer/research/radar-rgb-bfs/Data/CSL_pantry/groundtruth
 step_height: 30
 step_width: 30
+pantry_12: True

@@ -35,8 +35,12 @@ if __name__ == '__main__':
     step_height = setup_dict['step_height']
     step_width = setup_dict['step_width']
     gt_path = setup_dict['GT']
+    pantry_12_flag = setup_dict['pantry_12']
 
     test_name = pathlib.Path(test_path).parts[-2]
+    if pantry_12_flag:
+        test_name = 'pantry_12'
+
     runs = os.listdir(runs_dir)
     try: runs.remove('eval')
     except: pass
@@ -104,7 +108,10 @@ if __name__ == '__main__':
 
             # extract sparse predictions (channel 1)
             pred_images = [np.array(np.abs(output[ii, 1]) * 255, dtype=np.uint8) for ii in range(seq_len)]  # max abs val of float image is 1
-            run_results = compute_metrics(gt_images_run, pred_images, thresholds)
+            if pantry_12_flag:
+                run_results = compute_metrics(gt_images_run[:12], pred_images[:12], thresholds)
+            else:
+                run_results = compute_metrics(gt_images_run, pred_images, thresholds)
             results.append(run_results)
 
         print('\n')
