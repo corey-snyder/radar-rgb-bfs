@@ -5,6 +5,7 @@ from scipy import interpolate, integrate
 from argparse import ArgumentParser
 from skimage.io import imread
 from sklearn import metrics
+import sys
 
 
 def load_images(gt_path, pred_path):
@@ -77,6 +78,45 @@ def ROC_curve(results_dict, plot=False):
         plt.show()
 
     return fpr, tpr, auc
+
+
+def display_dir_results(results_list, save_path):
+    original_stdout = sys.stdout
+    with open(save_path + '/f-score.txt', 'w') as f:
+        sys.stdout = f
+
+        keys = results_list[0].keys()
+        all_FPRS = []
+        all_TPRS = []
+        all_AUCS = []
+        plt.figure()
+        for key in keys:
+            vals = []
+            for run in results_list:
+                vals.append(run[key]['f-measure'])
+                fpr, tpr, auc = ROC_curve(run, False)
+                plt.plot(fpr, tpr, '--', alpha=1)
+                all_FPRS.append(fpr)
+                all_TPRS.append(tpr)
+                all_AUCS.append(auc)
+
+            if True in np.isnan(np.array(vals)): print('F-score @ threshold {:.2f}: CONTAINS NAN(s)'.format(key))
+            else: print('F-score @ threshold {:.2f}:'.format(key))
+            print('Min: {:.3f} | Max: {:.3f} | Mean: {:.3f} +/- {:.3f}'.format(np.nanmin(vals),np.nanmax(vals),
+                                                                               np.nanmean(vals), np.nanstd(vals)))
+    sys.stdout = original_stdout  # Reset the standard output to its original value
+    auc_mean = np.mean(all_AUCS)
+    auc_std = np.std(all_AUCS)
+
+    plt.title('ROC Curves AUC = m:{:.3f},std:{:.3f}'.format(np.mean(all_AUCS),np.std(all_AUCS)))
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    # plt.show()
+
+    if save_path:
+        plt.savefig(save_path + '/ROC.png')
+
+    return auc_mean, auc_std
 
 
 if __name__ == '__main__':
