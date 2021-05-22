@@ -1,0 +1,14 @@
+cosine_multiplier: 0
+downsample: 0.25
+lr: 0.001
+n_layers: 8
+patch_height: 80
+patch_width: 80
+radar_inclusion_type: before
+schedule_multiplier: 0.1
+schedule_step: 30000
+seed: 2
+seq_len: 30
+test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_700/raw
+train_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_side_0/raw
+try_gpu: true
