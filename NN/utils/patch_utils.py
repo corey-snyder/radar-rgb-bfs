@@ -83,9 +83,9 @@ def infer_full_image(full_rgb_input, network, patch_shape, step_shape, device, R
             patch_rgb_input = patches_rgb[:, :, ii, jj].to(device)
             if R is not None:
                 patch_radar_input = patches_radar[:, :, jj].to(device)
-                patches_out[:, :, ii, jj] = network(patch_rgb_input, patch_radar_input)
+                patches_out[:, :, ii, jj] = network(patch_rgb_input, patch_radar_input).detach()
             else:
-                patches_out[:, :, ii, jj] = network(patch_rgb_input)
+                patches_out[:, :, ii, jj] = network(patch_rgb_input).detach()
 
     # fold data
     # reshape output to match F.fold input
