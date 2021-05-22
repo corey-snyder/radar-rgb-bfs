@@ -1,8 +1,7 @@
-run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/radar/len30/train_side
+run_path: runs/radar/len30/train_side
 #run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/BASELINE_l2_lr0.001_ds0.25_seed0__19-05-2021_21-15-50
-test_path: /home/spencer/research/radar-rgb-bfs/Data/CSL_pantry/raw
+test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_pantry/raw
 try_gpu: True
-GT: /home/spencer/research/radar-rgb-bfs/Data/CSL_pantry/groundtruth
+GT: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_pantry/groundtruth
 step_height: 30
 step_width: 30
-pantry_12: True
