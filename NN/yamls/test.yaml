@@ -1,7 +1,7 @@
-run_path: runs/radar/len50/train_side
-test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_pantry/raw
+run_path: runs/8_layers/radar/len30/train_lobby_700
+test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_side_0/raw
 try_gpu: True
-GT: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_pantry/groundtruth
+GT: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_side_0/groundtruth
 step_height: 30
 step_width: 30
 pantry_12: False
