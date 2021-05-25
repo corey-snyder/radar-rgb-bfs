@@ -47,6 +47,14 @@ def load_radar_rgb_data(path, n_frames, rescale_factor = 1., iterations = 400, p
     return D, L, S, torch.from_numpy(R).float()
 
 
+def threshold_data(input, thresh):
+    input_abs = torch.abs(input)
+    input_abs[input_abs < thresh] = 0
+    input_abs[input_abs >= thresh] = 1
+
+    return input_abs
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
