@@ -29,7 +29,6 @@ if __name__ == '__main__':
 
     train_path = setup_dict['train_path']
     test_path = setup_dict['test_path']
-    n_layers = setup_dict['n_layers']
     try_gpu = setup_dict['try_gpu']
     downsample_rate = setup_dict['downsample']  # in each dim
     learning_rate = setup_dict['lr']
