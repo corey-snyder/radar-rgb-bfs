@@ -1,0 +1,12 @@
+downsample: 0.25
+lr: 0.001
+patch_height: 80
+patch_width: 80
+schedule_multiplier: 0.1
+schedule_step: 30000
+seed: 2
+seq_len: 30
+test_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_side_0/raw
+thresh: 0.075
+train_path: /mnt/data0-nfs/shared-datasets/rpca_test_data/Data/CSL_lobby_700/raw
+try_gpu: true
