@@ -92,8 +92,10 @@ if __name__ == '__main__':
     # tensorboard graph
     writer.add_graph(model, D_train_full[:, :, :patch_height, :patch_width].to(device))
 
-    n_epochs = 10000  # number of epochs to train the model
+    n_epochs = 50000  # number of epochs to train the model
     valid_loss_min = np.Inf  # track change in validation loss
+    train_loss_min = np.Inf  # track change in train loss
+
 
     #################################################################
 
@@ -168,7 +170,12 @@ if __name__ == '__main__':
             # save model if test loss has decreased
             if (valid_loss <= valid_loss_min) and (valid_loss != 0):
                 print('Epoch: {} \tValidation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(epoch, valid_loss_min, valid_loss))
-                torch.save(model.state_dict(), log_dir + '/model_bfs.pt')
+                torch.save(model.state_dict(), log_dir + '/model_bfs_test.pt')
                 valid_loss_min = valid_loss
+
+            if (train_loss <= train_loss_min) and (train_loss != 0):
+                print('Epoch: {} \tTrain loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(epoch, train_loss_min, train_loss))
+                torch.save(model.state_dict(), log_dir + '/model_bfs_train.pt')
+                train_loss_min = train_loss
 
         scheduler.step()
