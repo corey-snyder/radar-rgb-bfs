@@ -32,6 +32,7 @@ if __name__ == '__main__':
     run_path = setup_dict['run_path']
     test_path = setup_dict['test_path']
     try_gpu = setup_dict['try_gpu']
+    net_choice = setup_dict['net_choice']
 
     # if groundtruth is linked, provide F-score and AUC/ROC results
     if 'GT' in setup_dict:
@@ -40,7 +41,13 @@ if __name__ == '__main__':
         gt_path = setup_dict['GT']
     else: quant_flag = False
 
-    net_path = run_path + '/model_bfs.pt'
+    if net_choice == 'test':
+        net_path = run_path + '/model_bfs_test.pt'
+    elif net_choice == 'train':
+        net_path = run_path + '/model_bfs_train.pt'
+    else:
+        raise Exception('Model Option not test or train')
+
     yaml_train_path = run_path + '/train.yaml'
 
     # open and train yaml file to get details about network and input details
@@ -74,6 +81,7 @@ if __name__ == '__main__':
 
     # init model
     model = UNet(n_channels=seq_len, n_classes=seq_len)
+    model.load_state_dict(torch.load(net_path))
     model.to(device)
 
     output = model(D.to(device))
