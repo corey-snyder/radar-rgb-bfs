@@ -83,6 +83,7 @@ if __name__ == '__main__':
     model = UNet(n_channels=seq_len, n_classes=seq_len)
     model.load_state_dict(torch.load(net_path))
     model.to(device)
+    model.eval()
 
     output = model(D.to(device))
     output = output.detach().cpu().numpy()
