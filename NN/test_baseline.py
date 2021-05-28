@@ -10,6 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 import argparse
 import yaml
 from datetime import datetime
+import pathlib
 import shutil
 import matplotlib.pyplot as plt
 from baseline.model import IstaNet
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     try_gpu = setup_dict['try_gpu']
     step_height = setup_dict['step_height']
     step_width = setup_dict['step_width']
+    save_output_flag = setup_dict['save_output']
 
     # if groundtruth is linked, provide F-score and AUC/ROC results
     if 'GT' in setup_dict:
@@ -79,6 +81,11 @@ if __name__ == '__main__':
 
     output = infer_full_image(D, model, data_shape, step_shape, device)
     output, D = output.detach().cpu().numpy(), D.detach().cpu().numpy()
+
+    if save_output_flag:
+        save_path = pathlib.Path(test_path).parent
+        np.save(str(save_path) + '/outputs/' + str(pathlib.Path(run_path).name)+'_output.npy',output)
+
 
     plot_func(output, D)
 
