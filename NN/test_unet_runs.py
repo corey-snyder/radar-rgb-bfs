@@ -42,7 +42,7 @@ if __name__ == '__main__':
     if pantry_12_flag:
         test_name = 'pantry_12'
 
-    save_dir = runs_dir + '/eval/' + test_name
+    save_dir = runs_dir + '/eval/' + test_name + '_' + net_choice
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -71,7 +71,6 @@ if __name__ == '__main__':
 
         with open(yaml_train_path) as file:
             setup_dict = yaml.load(file, Loader=yaml.FullLoader)
-        n_layers = setup_dict['n_layers']
         downsample_rate = setup_dict['downsample']
         patch_height = setup_dict['patch_height']
         patch_width = setup_dict['patch_width']
