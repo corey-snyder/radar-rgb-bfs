@@ -22,7 +22,7 @@ if __name__ == '__main__':
     S = np.load(s_path)
 
     # Compute F-scores
-    thresholds = [i * 0.05 for i in range(20)]
+    thresholds = [0, .01, .02, .03, .04] + [i * 0.05 for i in range(1, 20)]
     filenames = os.listdir(gt_path)
     gt_images = []
     for ii in range(len(filenames)):

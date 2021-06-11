@@ -20,4 +20,4 @@ radar_inclusion_type: 'after'
 cosine_multiplier: 0
 
 # Unet
-thresh: .075
+thresh: .15

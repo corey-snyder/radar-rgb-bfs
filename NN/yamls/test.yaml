@@ -10,12 +10,14 @@ pantry_12: False
 #run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/8_layers/baseline/len30/train_side/BASELINE_l8_lr0.001_ds0.25_seed0_len30__23-05-2021_20-44-10
 #run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/2_layers/radar/len30/train_side/RADAR_after_l2_lr0.001_ds0.25_seed0_len30_cos0__21-05-2021_10-08-49
 #run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/8_layers/radar/len30/train_side/RADAR_after_l8_lr0.001_ds0.25_seed0_len30_cos0__24-05-2021_08-29-31
+#run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/unet/len30/train_lobby_700/thresh15/UNET_thresh0.15_lr0.001_ds0.25_seed0_len30__10-06-2021_17-04-32
+#run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/2_layers/radar/len30/train_side/cosine_loss/cos.01
 
 run_path: /home/spencer/research/radar-rgb-bfs/NN/runs/2_layers/radar/len30/train_side/cosine_loss
-test_path: ../Data/CSL_lobby_700/raw
+test_path: ../Data/CSL_lobby_side_0/raw
 try_gpu: True
-GT: ../Data/CSL_lobby_700/groundtruth
+GT: ../Data/CSL_lobby_side_0/groundtruth
 step_height: 30
 step_width: 30
 save_output: True
-net_choice: 'test'
+net_choice: 'train'
