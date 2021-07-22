@@ -81,9 +81,9 @@ def ista(M, delta=1e-6, mu=None, maxiter=400, verbose=False, missing_data=True,
         nnzs.append(np.sum(S > 0))
 
         if verbose:
-            print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
-                   "time={4:.3e}")
-                  .format(i, err, np.sum(s > 0), np.sum(S > 0), svd_time))
+            # print(("Iteration {0}: error={1:.3e}, rank={2:d}, nnz={3:d}, "
+            #        "time={4:.3e}")
+            #       .format(i, err, np.sum(s > 0), np.sum(S > 0), svd_time))
             if (plot_num is not None) and (i % plot_num ==0):
                 if im_shape is None:
                     print('Need im shape')
