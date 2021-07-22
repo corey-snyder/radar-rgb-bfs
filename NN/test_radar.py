@@ -19,6 +19,7 @@ from utils.patch_utils import *
 from utils.plot_utils import *
 from utils.evaluation_utils import *
 from utils.tensorboard_utils import plot_classes_preds
+from time import time
 
 
 if __name__ == '__main__':
@@ -79,8 +80,10 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(net_path))
     model.to(device)
     model.eval()
-
-    output = infer_full_image(D, model, data_shape, step_shape, device, R=R)
+    with torch.no_grad():
+        start = time()
+        output = infer_full_image(D, model, data_shape, step_shape, device, R=R)
+        print(time()-start)
     output, D = output.detach().cpu().numpy(), D.detach().cpu().numpy()
 
     if save_output_flag:
