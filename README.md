@@ -1,6 +1,8 @@
 # radar-rgb-bfs
 This repository provides the codes for the paper "Multimodal Unrolled Robust PCA for Background Foreground Separation" by Spencer Markowitz, Corey Snyder, Yonina C. Eldar, and Minh N. Do.
 
+![RUSTIC model digram](network_types.png)
+
 If you find this repository useful, please consider citing the following work:
 ```bibtex
 @ARTICLE{9772940,
@@ -13,3 +15,16 @@ If you find this repository useful, please consider citing the following work:
   pages={3553-3564},
   doi={10.1109/TIP.2022.3172851}}
 ```
+
+# Using this repository
+
+## Setup
+The required packages to use this repository are included in the ``requirements.txt`` file. These packages may be installed using pip as follows:
+
+```
+pip install -r requirements.txt
+```
+
+## Training examples
+
+## Evaluation
