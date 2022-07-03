@@ -10,7 +10,7 @@ from test import plot_func
 import os
 from skimage.io import imread
 import sys
-sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
+sys.path.append('/mnt/data0-nfs/cesnyde2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results, ROC_curve
 
 def pad_or_truncate(some_list, target_len):
@@ -137,5 +137,5 @@ if __name__ == '__main__':
         #plt.show()
     print('\n')
     auc_mean,auc_std = display_dir_results(results)
-    print(auc_mean,auc_std)
-    np.save('roc_auc/l8_radar_auc_csl_pantry_12.npy',[ auc_mean,auc_std],allow_pickle=True)
+    print('Mean AUC = {:.5f} +/- {:.5f}'.format(auc_mean, auc_std))
+    #np.save('roc_auc/l8_radar_auc_csl_pantry_12.npy',[ auc_mean,auc_std],allow_pickle=True)

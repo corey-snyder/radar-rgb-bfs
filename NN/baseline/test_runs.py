@@ -6,16 +6,15 @@ from train import load_data
 import argparse
 import yaml
 from train import infer_full_image
+from test import plot_func
 import os
 from skimage.io import imread
 import sys
-sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
+sys.path.append('/mnt/data0-nfs/cesnyde2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results, ROC_curve
-
 
 def pad_or_truncate(some_list, target_len):
     return np.concatenate([some_list,np.array(np.nan*np.ones(target_len - len(some_list)))])
-
 
 def display_dir_results(results_list):
     keys = results_list[0].keys()
@@ -58,6 +57,7 @@ def display_dir_results(results_list):
 
     return auc_mean, auc_std
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
@@ -68,6 +68,7 @@ if __name__ == '__main__':
         setup_dict = yaml.load(file, Loader=yaml.FullLoader)
     runs_dir = setup_dict['runs_dir'][0]
     test_data = setup_dict['test_data'][0]
+    test_radar_data = setup_dict['test_radar_data'][0]
     try_gpu = setup_dict['try_gpu'][0]
     step_height = setup_dict['step_height'][0]
     step_width = setup_dict['step_width'][0]
@@ -81,7 +82,6 @@ if __name__ == '__main__':
     gt_images = []
     for ii in range(len(filenames)):
         gt_images.append(imread(os.path.join(gt_path, 'rgb_%i.png' % ii)))
-
 
     for run in runs:
         run_path = runs_dir + run
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         else:
             print('CUDA is available!  Testing on GPU ...')
 
-        D, L_target, S_target = load_data(test_data,rescale_factor=downsample_rate, print_flag=False)
+        D, L_target, S_target = load_data(test_data, rescale_factor=downsample_rate, print_flag=False)
         data_shape = list(np.concatenate([D.shape[:2],[patch_height,patch_width]]))
         step_shape = (step_height, step_width)
 
@@ -133,10 +133,6 @@ if __name__ == '__main__':
         # display_results(temp_results)
         results.append(temp_results)
     print('\n')
-    auc_mean, auc_std = display_dir_results(results)
-    print(auc_mean, auc_std)
-    np.save('roc_auc/l8_og_auc_csl_pantry_12.npy',[auc_mean, auc_std],allow_pickle=True)
-
-
-
-
+    auc_mean,auc_std = display_dir_results(results)
+    print('Mean AUC = {:.5f} +/- {:.5f}'.format(auc_mean, auc_std))
+    #np.save('roc_auc/l8_radar_auc_csl_pantry_12.npy',[ auc_mean,auc_std],allow_pickle=True)

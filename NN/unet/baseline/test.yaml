@@ -1,17 +1,14 @@
 run_path:
-  - ../runs/UNET_OG_thresh_0.1_lr_0.001_ds_0.25__11-03-2021_18-01-33
+  - runs/UNET_thresh0.1_seed1_lr0.001_ds0.25_02-07-2022_19-19-37/
 net_name:
   - model_bfs_lowest_train.pt
   #- model_bfs.pt
 test_path:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/eceb_lobby
-  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_700
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_lobby_side_0
-#  - ../../output/csl_lobby_700
+  - ../../../traindata/csl_lobby_700
 try_gpu:
   - True
 GT:
-  - ../../../RGB_images/groundtruth
+  - ../../../imagedata/CSL_lobby_700/groundtruth
 step_height:
   - 30
 step_width:

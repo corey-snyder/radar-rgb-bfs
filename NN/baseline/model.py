@@ -34,9 +34,8 @@ class IstaLayer(nn.Module):
         mu = .5  # assume mean abs value of input is .5
 
         # notice in line below, mu is multiplied by 2
-        self.lambda1 = nn.Parameter(torch.tensor([2/mu]))
-        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
-
+        self.lambda1 = nn.Parameter(torch.tensor([2/mu]).float())
+        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]).float())
         # self.lambda1 = nn.Parameter(torch.tensor([5.]))  # change
         # self.lambda2 = nn.Parameter(torch.tensor([.0003]))  # change
 
@@ -54,8 +53,7 @@ class IstaLayer(nn.Module):
         For example, L convolved with P_5 will be labeled L5
         """
         # print(self.lambda1, self.lambda2)
-        (D,L,S) = input
-
+        (D, L, S) = input
         L5 = self.p5(L)
         L6 = self.p6(L)
         D1 = self.p1(D)
@@ -76,7 +74,6 @@ class IstaLayer(nn.Module):
         D_out = D
         L_out = L_stacked.T.reshape(-1,1,self.im_height,self.im_width)
         S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-self.lambda2)
-
         return D_out, L_out, S_out
 
 

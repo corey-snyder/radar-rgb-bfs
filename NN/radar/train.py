@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import os
 from model import IstaNet
 from torch.utils.tensorboard import SummaryWriter
 from tensorboard_helper import plot_classes_preds
@@ -154,10 +155,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-yaml", help="path of yaml file", type=str)
     args = parser.parse_args()
-    yampl_path = args.yaml
+    yaml_path = args.yaml
 
-    with open(yampl_path) as file:
-        setup_dict = yaml.load(file,Loader=yaml.FullLoader)
+    with open(yaml_path) as file:
+        setup_dict = yaml.load(file, Loader=yaml.FullLoader)
     train_path = setup_dict['train_path'][0]
     radar_data_train_full = setup_dict['train_radar_input'][0]
     test_path = setup_dict['test_path'][0]
@@ -207,10 +208,10 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_name = 'RADAR_before_l'+str(n_layers) + '_lr_' + str(learning_rate) + '_ds_' + str(downsample_rate) + 'cos' + str(cosine_multiplier)
-    log_dir = '../runs/'+log_name+'__'+dt_string
+    log_name = 'RUSTIC_before_seed{}_{}layers_lr{}_ds{}_cos{}_'.format(seed, n_layers, learning_rate, downsample_rate, cosine_multiplier)
+    log_dir = os.path.join('runs', log_name+dt_string)
     writer = SummaryWriter(log_dir)
-    shutil.copyfile(yampl_path, log_dir + '/setup.yaml')
+    shutil.copyfile(yaml_path, log_dir + '/setup.yaml')
 
     # init model
     data_shape = list(np.concatenate([D_train_full.shape[:2],[patch_height,patch_width]]))

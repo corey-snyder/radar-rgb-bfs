@@ -1,17 +1,27 @@
+# directory for runs we want to evaluate
 runs_dir:
-  - ../runs/l8_og/
+  - runs/
+
+# data directory for scene we would like to evaluate 
 test_data:
-#  - /mnt/data0-nfs/shared-datasets/rpca_test_data/output/csl_pantry
-  - ../../output/csl_pantry
-# - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_700
-# - /home/spencer/research/radar-rgb-bfs/output/csl_lobby_side_0
+  - ../../traindata/csl_lobby_side_0
+
+# radar data file for scene we would like to evaluate
+test_radar_data:
+  - ../../traindata/csl_lobby_side_0/radar_frames_csl_side_0_likelihood.npy
+
+# directory for annotated ground-truth images on evaluation scene
 GT:
-  - ../../RGB_images_csl_pantry/groundtruth
-#  - ../../RGB_images_csl_lobby_side_0/groundtruth
-#  - ../../RGB_images/groundtruth
+  - ../../imagedata/CSL_lobby_side_0/groundtruth/
+
+# try to use GPU for evalutaiton
 try_gpu:
-  - False
+  - True
+
+# stride along height dimension for reconstructing full output image from patchwise inference
 step_height:
   - 30
+
+# stride along width dimension for reconstructing full output image
 step_width:
   - 30

@@ -34,8 +34,8 @@ class IstaLayer(nn.Module):
         mu = .5  # assume mean abs value of input is .5
 
         # notice in line below, mu is multiplied by 2
-        self.lambda1 = nn.Parameter(torch.tensor([2/mu]))
-        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]))
+        self.lambda1 = nn.Parameter(torch.tensor([2/mu]).float())
+        self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]).float())
 
         self.threshold = nn.Threshold(0,0)
 
@@ -52,7 +52,7 @@ class IstaLayer(nn.Module):
         """
         # print(self.lambda1, self.lambda2)
         (D,L,S,R,save_sparse) = input
-
+    
         L5 = self.p5(L)
         L6 = self.p6(L)
         D1 = self.p1(D)
@@ -72,6 +72,7 @@ class IstaLayer(nn.Module):
         (u,s,v) = torch.svd(L5_D1_S3)
         s = s - self.lambda1
         s = self.threshold(s)
+
         L_stacked = torch.mm(torch.mm(u, torch.diag(s)), v.t())
 
         D_out = D
@@ -126,14 +127,4 @@ class IstaNet(nn.Module):
                     components = components[:-1]
                 (D, L, S, R, save_sparse) = components
                 return torch.cat((L, S), 1), torch.cat(L6_D2_S4_radar_list, 1)
-
-
-
-
-
-
-
-
-
-
 

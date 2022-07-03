@@ -2,14 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from unet_model import UNet
-from train_og import load_data
+from train import load_data
 import argparse
 import yaml
-from train_og import infer_full_image
+from train import infer_full_image
 import os
 from skimage.io import imread
 import sys
-sys.path.append('/mnt/data0-nfs/samarko2/radar-rgb-bfs')
 from evaluate import compute_metrics, display_results
 
 

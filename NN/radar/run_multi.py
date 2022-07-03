@@ -16,6 +16,6 @@ if __name__ == '__main__':
     #yamls.sort(key=float)
 
     for setup_file in yamls:
-        os.system("CUDA_VISIBLE_DEVICES=" + str(device) + " python train.py -yaml " + yaml_dir + setup_file)
+        os.system("CUDA_VISIBLE_DEVICES=" + str(device) + " python3 train.py -yaml " + yaml_dir + setup_file)
 
 

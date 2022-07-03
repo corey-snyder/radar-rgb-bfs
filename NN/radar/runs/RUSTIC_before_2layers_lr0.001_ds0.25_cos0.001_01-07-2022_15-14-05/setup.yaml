@@ -1,58 +1,40 @@
-# path for evaluation scene data
 test_path:
   - ../../traindata/csl_lobby_side_0
 
-# path for evaluation scene radar data
 test_radar_input:
   - ../../traindata/csl_lobby_side_0/radar_frames_csl_side_0_likelihood.npy
 
-# path for training scene data
 train_path:
   - ../../traindata/csl_lobby_700
 
-# path for trainin scene radar data
 train_radar_input:
   - ../../traindata/csl_lobby_700/radar_frames_csl_lobby_700_likelihood.npy
 
-# number of layers in unrolled network
 n_layers:
   - 2
-# downsampling factor for images 
 downsample:
   - .25
-# try to use an available GPU for training
 try_gpu:
   - True
-# learning rate
 lr:
   - .001
-# training step/epoch at which to reduce learning rate
 schedule_step:
   - 30000
-# factor by which to reduce learning rate, i.e. lr_new = lr*schedule_multiplier
 schedule_multiplier:
   - .1
-# weight for cosine similarity regularizer
 cosine_multiplier:
   - .001
-# height of patches random cropping during training
 patch_height:
   - 80
-# width of patches
 patch_width:
   - 80
-# random seed for experiment
 seed:
   - 1
-# sparse foreground from Robust PCA for evaluation scene
 S_test:
   - ../../traindata/csl_lobby_side_0/S_radar_3.0_0.5_pcp.npy
-# low-rank background from RPCA on evaluation scene
 L_test:
   - ../../traindata/csl_lobby_side_0/L_radar_3.0_0.5_pcp.npy
-# sparse foreground from RPCA on training scene
 S_train:
   - ../../traindata/csl_lobby_700/S_radar_3.0_0.5_pcp.npy
-# low-rank background from RPCA on training scene
 L_train:
   - ../../traindata/csl_lobby_700/L_radar_3.0_0.5_pcp.npy
