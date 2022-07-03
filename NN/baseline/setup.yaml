@@ -44,18 +44,19 @@ mask:
 seed:
   - 1
 
-# sparse foreground from RPCA for training scene
-S_train:
-  - ../../traindata/csl_lobby_700/S_radar_3.0_0.5_pcp.npy
+# Note: for the below parameters we choose null (or None) in order to select our default
+# values for L and S in each scene. You may specify another path should you generate
+# different L or S .npy files for each scene.
 
-# low-rank background for training scene
-L_train:
-  - ../../traindata/csl_lobby_700/L_radar_3.0_0.5_pcp.npy
-
-# sparse foreground for testing scene
+# sparse foreground from Robust PCA for evaluation scene
 S_test:
-  - ../../traindata/csl_lobby_side_0/S_radar_3.0_0.5_pcp.npy
-
-# low-rank background for testing scene
+  - null
+# low-rank background from RPCA on evaluation scene
 L_test:
-  - ../../traindata/csl_lobby_side_0/L_radar_3.0_0.5_pcp.npy
+  - null
+# sparse foreground from RPCA on training scene
+S_train:
+  - null
+# low-rank background from RPCA on training scene
+L_train:
+  - null
