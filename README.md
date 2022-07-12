@@ -40,7 +40,7 @@ Our codebase refers to three scenes called ``CSL_lobby_700``, ``CSL_lobby_side_0
 Running the training codes for the RUSTIC, CORONA, and U-Net models is quite similar between each model. For clarity, we provide a brief explanation on running each algorithm
 
 ### RUSTIC
-To run our RUSTIC model, navigate to the ``NN/radar`` directory. You may establish the necessary experimental parameters in the ``setup.yaml`` file including learning rate, number of layers, training scene, evaluation scene, and more. The YAML file provides brief comments for each parameter. Once you have your YAML file set, you may perform a training run with the following command:
+To run our RUSTIC model, navigate to the ``NN/radar`` directory. You may establish the necessary experimental parameters in the ``setup.yaml`` file including model variant ('in', 'before', or 'after'), learning rate, number of layers, training scene, evaluation scene, and more. The YAML file provides brief comments for each parameter. Once you have your YAML file set, you may perform a training run with the following command:
 
 ```
 CUDA_VISIBLE_DEVICES=X python3 train.py -yaml setup.yaml
