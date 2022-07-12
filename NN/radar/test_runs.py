@@ -96,6 +96,8 @@ if __name__ == '__main__':
         patch_height = setup_dict['patch_height'][0]
         patch_width = setup_dict['patch_width'][0]
 
+        variant = run.split('_')[1]
+
         # check if CUDA is available
         if try_gpu:
             train_on_gpu = torch.cuda.is_available()
@@ -113,7 +115,7 @@ if __name__ == '__main__':
         step_shape = (step_height, step_width)
 
         (n_frames,n_channels,im_height,im_width) = D.shape
-        model = IstaNet(data_shape,n_layers)
+        model = IstaNet(data_shape, n_layers, variant)
         model.load_state_dict(torch.load(net_path))
         model.to(device)
         model.eval()

@@ -178,6 +178,7 @@ if __name__ == '__main__':
     L_train_path = setup_dict['L_train'][0]
     S_test_path = setup_dict['S_test'][0]
     L_test_path = setup_dict['L_test'][0]
+    variant = setup_dict['variant'][0]
 
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -208,14 +209,14 @@ if __name__ == '__main__':
     # Destination for tensorboard log data
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_name = 'RUSTIC_before_seed{}_{}layers_lr{}_ds{}_cos{}_'.format(seed, n_layers, learning_rate, downsample_rate, cosine_multiplier)
+    log_name = 'RUSTIC_{}_seed{}_{}layers_lr{}_ds{}_cos{}_'.format(variant, seed, n_layers, learning_rate, downsample_rate, cosine_multiplier)
     log_dir = os.path.join('runs', log_name+dt_string)
     writer = SummaryWriter(log_dir)
     shutil.copyfile(yaml_path, log_dir + '/setup.yaml')
 
     # init model
     data_shape = list(np.concatenate([D_train_full.shape[:2],[patch_height,patch_width]]))
-    model = IstaNet(data_shape,n_layers)
+    model = IstaNet(data_shape, n_layers, variant)
     model.to(device)
     # specify loss function (categorical cross-entropy)
     criterion = nn.MSELoss()
@@ -223,12 +224,7 @@ if __name__ == '__main__':
 
     # specify optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step)
-
-    # tensorboard graph
-    writer.add_graph(model, (D_train_full[:,:,:patch_height,:patch_width].to(device),D_train_full[:,:,:patch_height,:patch_width].to(device),
-                            D_train_full[:,:,:patch_height,:patch_width].to(device),R_train_full[:,:,:patch_width].to(device)))
-    # writer.close()
+    scheduler = optim.lr_scheduler.StepLR(optimizer,gamma=schedule_multiplier,step_size=schedule_step) 
 
     # train
 

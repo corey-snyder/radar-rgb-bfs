@@ -46,7 +46,7 @@ seed:
   - 1
 # model variant: in, before, or after
 variant:
-  - 'after'
+  - 'before'
 
 
 # Note: for the below parameters we choose null (or None) in order to select our default

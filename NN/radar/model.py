@@ -16,7 +16,7 @@ class IstaLayer(nn.Module):
     Assuming images are grayscale
     """
 
-    def __init__(self, im_height, im_width, im_channels, im_kernel_size, radar_kernel_size, im_padding, radar_padding):
+    def __init__(self, im_height, im_width, im_channels, im_kernel_size, radar_kernel_size, im_padding, radar_padding, variant):
         super().__init__()
 
         # self.n_frames = n_frames
@@ -38,6 +38,8 @@ class IstaLayer(nn.Module):
         self.lambda2 = nn.Parameter(torch.tensor([.1*lambda_from_pcp/mu]).float())
 
         self.threshold = nn.Threshold(0,0)
+        # in, before, or after
+        self.variant = variant
 
     def forward(self, input):
         """
@@ -65,10 +67,9 @@ class IstaLayer(nn.Module):
 
         L5_D1_S3 = L5+D1+S3
         L6_D2_S4 = L6+D2+S4
-        L6_D2_S4_radar = L6_D2_S4 * R7_2dim
 
         L5_D1_S3 = torch.reshape(L5_D1_S3,(-1,self.im_height*self.im_width)).T
-
+        
         (u,s,v) = torch.svd(L5_D1_S3)
         s = s - self.lambda1
         s = self.threshold(s)
@@ -77,8 +78,17 @@ class IstaLayer(nn.Module):
 
         D_out = D
         L_out = L_stacked.T.reshape(-1,1,self.im_height,self.im_width)
-
-        S_out = torch.sign(L6_D2_S4_radar)*self.threshold(torch.abs(L6_D2_S4_radar)-self.lambda2)
+        
+        # before
+        if self.variant == 'before':
+            L6_D2_S4_radar = L6_D2_S4 * R7_2dim
+            S_out = torch.sign(L6_D2_S4_radar)*self.threshold(torch.abs(L6_D2_S4_radar)-self.lambda2)
+        # in
+        elif self.variant == 'in':
+            S_out = torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-(self.lambda2*R7_2dim))
+        # after
+        else:
+            S_out = (torch.sign(L6_D2_S4)*self.threshold(torch.abs(L6_D2_S4)-self.lambda2))*R7_2dim
 
         if save_sparse:
             return D_out, L_out, S_out, R, save_sparse, L6_D2_S4_radar
@@ -87,11 +97,14 @@ class IstaLayer(nn.Module):
 
 
 class IstaNet(nn.Module):
-        def __init__(self, shape, n_layers):
+        def __init__(self, shape, n_layers, variant):
             super().__init__()
             self.n_channels = shape[1]
             self.im_height = shape[2]
             self.im_width = shape[3]
+            if variant not in ['in', 'before', 'after']:
+                raise ValueError('variant must be in, before, or after')
+            self.variant = variant
 
             self.layers = nn.ModuleList()
             for layer_idx in range(n_layers):
@@ -102,8 +115,8 @@ class IstaNet(nn.Module):
                 im_padding = int(np.floor(im_kernel_size / 2))
                 radar_kernel_size = 5
                 radar_kernel_padding = int(np.floor(radar_kernel_size / 2))
-                self.layers.append(IstaLayer(self.im_height, self.im_width, self.n_channels, im_kernel_size=im_kernel_size,
-                                   im_padding=im_padding,  radar_kernel_size = radar_kernel_size,radar_padding=radar_kernel_padding))
+                self.layers.append(IstaLayer(self.im_height, self.im_width, self.n_channels, im_kernel_size,
+                                    radar_kernel_size, im_padding, radar_kernel_padding, variant))
 
         def forward(self, D, L, S, R, save_sparse=False):
             """

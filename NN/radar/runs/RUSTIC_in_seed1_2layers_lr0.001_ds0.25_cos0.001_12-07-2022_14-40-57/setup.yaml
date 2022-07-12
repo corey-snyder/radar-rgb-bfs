@@ -44,6 +44,10 @@ patch_width:
 # random seed for experiment
 seed:
   - 1
+# model variant: in, before, or after
+variant:
+  - 'in'
+
 
 # Note: for the below parameters we choose null (or None) in order to select our default
 # values for L and S in each scene. You may specify another path should you generate
